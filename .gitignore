@@ -1,0 +1,10 @@
+target/
+build/
+.idea/
+*.iml
+.vscode/
+.env
+*.env
+application-local.yml
+application-local.properties
+.DS_Store
