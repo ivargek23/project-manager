@@ -11,3 +11,8 @@ Application for managing projects, tasks with dependencies, subtasks, critical-p
 ## Domain model
 
 ![Domain model](docs/domain_model.drawio.svg)
+
+## Prototype
+
+- Figma file: https://www.figma.com/design/J8fzbXuHwKIUMOLCqgbaSi/Project-and-task-management?node-id=0-1&t=ARnO8CqVVVWQxsEJ-1
+- Low-fidelity wireframes: [docs/design/wireframes.pdf](docs/design/wireframes.pdf)
