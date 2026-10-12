@@ -10,4 +10,4 @@ Application for managing projects, tasks with dependencies, subtasks, critical-p
 
 ## Domain model
 
-![Domain model](docs/domain-model.drawio.svg)
+![Domain model](docs/domain_model.drawio.svg)
