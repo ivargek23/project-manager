@@ -7,3 +7,7 @@ Application for managing projects, tasks with dependencies, subtasks, critical-p
 - **Hosting**: Render (web service, Frankfurt)
 - **Database**: Neon PostgreSQL (Frankfurt)
 - **AI provider**: Google Gemini (via Spring AI)
+
+## Domain model
+
+![Domain model](docs/domain-model.drawio.svg)
