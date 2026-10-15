@@ -16,3 +16,7 @@ Application for managing projects, tasks with dependencies, subtasks, critical-p
 
 - Figma file: https://www.figma.com/design/J8fzbXuHwKIUMOLCqgbaSi/Project-and-task-management?node-id=0-1&t=ARnO8CqVVVWQxsEJ-1
 - Low-fidelity wireframes: [docs/design/wireframes.pdf](docs/design/wireframes.pdf)
+
+## CI
+
+![Build and test](https://github.com/ivargek23/project-manager/actions/workflows/build-and-test.yml/badge.svg)
