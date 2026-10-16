@@ -26,3 +26,4 @@ Application for managing projects, tasks with dependencies, subtasks, critical-p
 https://project-manager-i464.onrender.com
 
 Hosted on Render's free plan (Frankfurt) with a Neon PostgreSQL database (Frankfurt). The free service sleeps after about 15 minutes without traffic, so the first request after a pause can take about two minutes while the application starts.
+
