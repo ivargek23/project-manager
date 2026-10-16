@@ -63,3 +63,12 @@ Entities are used for CRUD on screens and through the REST API. Graph computatio
 2. `project_id` in `task_dependency` is redundant data. The service sets it from the predecessor task, and the composite foreign keys reject any inconsistency.
 
 3. The recursive query is native SQL written for PostgreSQL, so it is verified with Testcontainers against a real PostgreSQL instance rather than H2.
+
+## Update (2026-10-16): estimate unit
+
+Task and subtask estimates are stored in whole working days (`estimate_days`), not hours.
+The critical path, the schedule and the prototype all work in working days, so one unit everywhere means no conversion and nothing to keep in sync.
+
+Rejected: storing hours and showing days. It is more precise for small subtasks, but the critical path would need an "hours per working day" setting, which is one more thing to define and explain.
+
+Consequence: estimates smaller than one day can't be expressed. For this project that is fine, because small work goes into subtasks, which only have a done flag in the plan.
