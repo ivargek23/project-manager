@@ -2,14 +2,14 @@
 
 The course allows and expects the use of AI assistants. This document describes
 how I used them while building the project. It is about my development process,
-not about the AI feature inside the application (see ADR 0003 for that) ![ADR-0003](./0003_ai_integration.md).
+not about the AI feature inside the application (see ADR 0003 for that) ![ADR-0003](adr/0003_ai_integration.md).
 
 ## Tools
 
 | Tool | Used for |
 |---|---|
 | Claude (claude.ai) | planning, domain model review, ADR drafts, wireframe instructions |
-| Figma AI agent (www.figma.com) | creating wireframe frames from my instructions |
+| Figma AI agent | creating wireframe frames and high-fidelity screens from my prompts |
 
 ## Log
 
