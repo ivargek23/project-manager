@@ -1,12 +1,14 @@
 package hr.algebra.project_manager.project.domain;
 
+import hr.algebra.project_manager.common.WorkStatus;
+import hr.algebra.project_manager.task.domain.Task;
+import hr.algebra.project_manager.user.domain.AppUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.scheduling.config.Task;
 
 import java.time.Instant;
 import java.time.LocalDate;

@@ -6,7 +6,7 @@ Application for managing projects, tasks with dependencies, subtasks, critical-p
 
 Project structure is a combination of a package-by-feature and layered architecture. Every feature has its own package, which is then divided into layers (`web`, `service`, `repository`, `domain`). All packages have some shared features, such as `common` (shared utilities), `config` (Spring configuration), `security` (authentication and authorization) and `exception` (custom exceptions).
 
-![Project structure](docs/project_structure.drawio.svg)
+![Project structure](docs/project_architecture.drawio.svg)
 
 ## Platform choices
 

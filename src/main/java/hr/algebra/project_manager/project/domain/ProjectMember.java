@@ -1,5 +1,6 @@
 package hr.algebra.project_manager.project.domain;
 
+import hr.algebra.project_manager.user.domain.AppUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
