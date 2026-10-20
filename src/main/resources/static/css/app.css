@@ -1,0 +1,347 @@
+/* Design tokens: same names and values as the Figma variables */
+:root {
+    --text-primary: #1F2328;
+    --text-secondary: #57606A;
+    --text-on-primary: #FFFFFF;
+    --surface-page: #FFFFFF;
+    --surface-subtle: #F6F8FA;
+    --border-default: #D0D7DE;
+    --border-input: #818B98;
+    --primary-default: #0969DA;
+    --primary-hover: #0550AE;
+    --primary-disabled: #8C959F;
+    --danger-default: #CF222E;
+
+    --status-todo-bg: #EAEEF2;
+    --status-todo-text: #424A53;
+    --status-progress-bg: #DDF4FF;
+    --status-progress-text: #0550AE;
+    --status-blocked-bg: #FFEBE9;
+    --status-blocked-text: #A40E26;
+    --status-done-bg: #DAFBE1;
+    --status-done-text: #116329;
+
+    --radius: 6px;
+    --font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font: 14px/20px var(--font); /* Body text style */
+    color: var(--text-primary);
+    background: var(--surface-subtle);
+}
+
+a {
+    color: var(--primary-default);
+}
+
+h1 {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Heading/L */
+h2 {
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Heading/M */
+main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 40px;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Top nav */
+.top-nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 40px;
+    height: 64px;
+    background: var(--surface-page);
+    border-bottom: 1px solid var(--border-default);
+}
+
+.brand {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.nav-links ul {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.nav-links a:hover, .nav-links a[aria-current="page"] {
+    color: var(--primary-default);
+}
+
+.lang-switch {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    color: var(--text-secondary);
+}
+
+.lang-switch a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Flash message */
+.flash-area {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 16px 40px 0;
+}
+
+.flash-area:empty {
+    display: none;
+}
+
+.flash {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+}
+
+.flash span {
+    flex: 1;
+}
+
+.flash-success {
+    background: var(--status-done-bg);
+    color: var(--status-done-text);
+}
+
+.flash-error {
+    background: var(--status-blocked-bg);
+    color: var(--status-blocked-text);
+}
+
+.flash-close {
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font: 500 13px/18px var(--font); /* Label text style */
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary-default);
+    color: var(--text-on-primary);
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+.btn-secondary {
+    background: var(--surface-page);
+    color: var(--primary-default);
+    border-color: var(--border-default);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-subtle);
+}
+
+.btn:disabled {
+    background: var(--primary-disabled);
+    color: var(--text-on-primary);
+    cursor: not-allowed;
+}
+
+.btn:focus-visible, .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
+    outline: 2px solid var(--primary-default);
+    outline-offset: 1px;
+}
+
+/* Form fields: Input and Select components */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.field label {
+    font: 500 13px/18px var(--font);
+}
+
+.field input, .field select, .field textarea {
+    font: inherit;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-input);
+    background: var(--surface-page);
+    color: var(--text-primary);
+}
+
+.field.has-error input, .field.has-error select, .field.has-error textarea {
+    border-color: var(--danger-default);
+}
+
+.field-error {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--danger-default);
+}
+
+/* Caption */
+
+/* Page header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+/* Card */
+.card {
+    background: var(--surface-page);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+/* Table: Table row component */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface-page);
+}
+
+.data-table th {
+    text-align: left;
+    font: 500 13px/18px var(--font);
+    color: var(--text-secondary);
+    background: var(--surface-subtle);
+    padding: 10px 12px;
+}
+
+.data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-default);
+    color: var(--text-secondary);
+}
+
+.data-table td:first-child {
+    color: var(--text-primary);
+}
+
+.data-table tbody tr:hover {
+    background: var(--surface-subtle);
+}
+
+/* Status chip */
+.chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font: 500 13px/18px var(--font);
+}
+
+.chip-TODO {
+    background: var(--status-todo-bg);
+    color: var(--status-todo-text);
+}
+
+.chip-IN_PROGRESS {
+    background: var(--status-progress-bg);
+    color: var(--status-progress-text);
+}
+
+.chip-BLOCKED {
+    background: var(--status-blocked-bg);
+    color: var(--status-blocked-text);
+}
+
+.chip-DONE {
+    background: var(--status-done-bg);
+    color: var(--status-done-text);
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 80px 16px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+/* Mobile (390 px frames) */
+@media (max-width: 640px) {
+    .top-nav {
+        padding: 0 16px;
+        gap: 16px;
+    }
+
+    main, .flash-area {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .btn {
+        justify-content: center;
+    }
+}
