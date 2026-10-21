@@ -53,13 +53,20 @@
             </thead>
             <tbody>
             <tr th:each="p : ${projects.content}">
-                <td><a th:href="@{/projects/{id}(id=${p.id})}" th:text="${p.name}">Website Redesign</a></td>
-                <td th:text="${p.leadName}">Michael Chen</td>
-                <td th:text="${#temporals.format(p.dueDate, #messages.msg('date.format'))}">15.12.2026.</td>
-                <td><span class="chip" th:classappend="'chip-' + ${p.status}"
-                          th:text="#{status.__${p.status}__}">In progress</span></td>
-                <td th:text="${p.taskCount}">20</td>
-                <td>
+                <td class="cell-name">
+                    <a th:href="@{/projects/{id}(id=${p.id})}" th:text="${p.name}">Website Redesign</a>
+                </td>
+                <td class="cell-meta" th:attr="data-label=#{project.column.lead}"
+                    th:text="${p.leadName}">Michael Chen</td>
+                <td class="cell-meta" th:attr="data-label=#{project.column.dueDate}"
+                    th:text="${#temporals.format(p.dueDate, #messages.msg('date.format'))}">15.12.2026.</td>
+                <td class="cell-status">
+                    <span class="chip" th:classappend="'chip-' + ${p.status}"
+                          th:text="#{status.__${p.status}__}">In progress</span>
+                </td>
+                <td class="cell-meta" th:attr="data-label=#{project.column.tasks}"
+                    th:text="${p.taskCount}">20</td>
+                <td class="cell-actions">
                     <div class="row-actions">
                         <a class="icon-btn" th:href="@{/projects/{id}/edit(id=${p.id})}"
                            th:aria-label="#{project.editNamed(${p.name})}" th:title="#{project.edit}">
