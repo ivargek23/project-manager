@@ -104,6 +104,14 @@ public class ProjectPageController {
         }
     }
 
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id,
+                         RedirectAttributes attributes) {
+        projectService.delete(id);
+        attributes.addFlashAttribute("successMessage", "project.deleted");
+        return "redirect:/projects";
+    }
+
     private void addFormOptions(Model model) {
         model.addAttribute("leads", userService.findLeadCandidates());
         model.addAttribute("statuses", WorkStatus.values());

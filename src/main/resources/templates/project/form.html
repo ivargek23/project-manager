@@ -81,6 +81,12 @@
                th:text="#{action.cancel}">Cancel</a>
         </div>
     </form>
+    <form class="danger-zone" method="post" th:if="${projectId != null}"
+          th:action="@{/projects/{id}/delete(id=${projectId})}"
+          th:data-confirm="#{project.delete.confirm(${form.name})}"
+          onsubmit="return confirm(this.dataset.confirm)">
+        <button class="btn btn-danger" type="submit" th:text="#{project.delete}">Delete project</button>
+    </form>
 </main>
 </body>
 </html>

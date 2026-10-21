@@ -373,3 +373,9 @@ main {
     .field-row { grid-template-columns: 1fr; }
     .form-actions { flex-direction: column; }
 }
+
+/* Delete */
+.btn-danger { background: var(--danger-default); color: var(--text-on-primary); }
+.btn-danger:hover { background: var(--status-blocked-text); }
+.danger-zone { max-width: 640px; margin-top: 16px; display: flex; justify-content: flex-end; }
+/*************/
