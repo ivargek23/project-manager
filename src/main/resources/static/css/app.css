@@ -361,3 +361,15 @@ main {
 
 .data-table td a { color: var(--text-primary); text-decoration: none; font-weight: 500; }
 .data-table td a:hover { color: var(--primary-default); text-decoration: underline; }
+
+.breadcrumb { display: flex; gap: 8px; margin-bottom: 8px; color: var(--text-secondary); }
+.breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+.form-card { max-width: 640px; margin-top: 24px; }
+.form-card .flash { margin-bottom: 16px; }
+.field textarea { min-height: 96px; resize: vertical; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions { display: flex; gap: 12px; margin-top: 8px; }
+@media (max-width: 640px) {
+    .field-row { grid-template-columns: 1fr; }
+    .form-actions { flex-direction: column; }
+}
