@@ -18,28 +18,38 @@
             <span class="chip" th:classappend="'chip-' + ${project.status}"
                   th:text="#{status.__${project.status}__}">In progress</span>
         </div>
-        <a class="btn btn-secondary" th:href="@{/projects/{id}/edit(id=${project.id})}"
-           th:text="#{project.edit}">Edit project</a>
+        <div class="header-actions">
+            <a class="btn btn-secondary" th:href="@{/projects/{id}/edit(id=${project.id})}" th:text="#{project.edit}">Edit project</a>
+            <a class="btn btn-primary" th:href="@{/projects/{id}/tasks/new(id=${project.id})}" th:text="#{task.add}">Add task</a>
+        </div>
     </div>
 
-    <section class="card project-summary">
-        <dl class="project-meta">
-            <div>
-                <dt th:text="#{project.field.lead}">Lead</dt>
-                <dd th:text="${project.leadName} ?: #{project.noLead}">Michael Chen</dd>
-            </div>
-            <div>
-                <dt th:text="#{project.field.startDate}">Start date</dt>
-                <dd th:text="${#temporals.format(project.startDate, #messages.msg('date.format'))}">01.09.2026.</dd>
-            </div>
-            <div>
-                <dt th:text="#{project.field.dueDate}">Due date</dt>
-                <dd th:text="${#temporals.format(project.dueDate, #messages.msg('date.format'))}">15.12.2026.</dd>
-            </div>
-        </dl>
-        <p class="project-description" th:if="${project.description}" th:text="${project.description}">
-            Redesign of the company website.</p>
+    <section class="summary-cards" th:aria-label="#{project.summary.label}">
+        <div class="card summary-card">
+            <span class="summary-label" th:text="#{project.field.lead}">Lead</span>
+            <span class="summary-value" th:text="${project.leadName} ?: #{project.noLead}">Michael Chen</span>
+        </div>
+        <div class="card summary-card">
+            <span class="summary-label" th:text="#{project.summary.dates}">Dates</span>
+            <span class="summary-value"
+                  th:text="${#temporals.format(project.startDate, #messages.msg('date.format'))} + ' – ' + ${#temporals.format(project.dueDate, #messages.msg('date.format'))}">
+            01.10.2026. – 15.12.2026.</span>
+        </div>
+        <div class="card summary-card">
+            <span class="summary-label" th:text="#{project.summary.progress}">Progress</span>
+            <span class="summary-value"
+                  th:text="#{project.summary.progressText(${doneCount}, ${#lists.size(tasks)})}">8 of 20 tasks done</span>
+            <progress th:value="${doneCount}" th:max="${#lists.isEmpty(tasks)} ? 1 : ${#lists.size(tasks)}"
+                      th:aria-label="#{project.summary.progress}"></progress>
+        </div>
+        <div class="card summary-card">
+            <span class="summary-label" th:text="#{project.summary.criticalPath}">Critical path</span>
+            <span class="summary-value muted" th:text="#{project.summary.notCalculated}">Not calculated yet</span>
+        </div>
     </section>
+
+    <p class="project-description" th:if="${project.description}" th:text="${project.description}">
+        Redesign of the company website.</p>
 
     <section class="task-section" aria-labelledby="tasks-heading">
         <h2 id="tasks-heading" th:text="#{task.list.title}">Tasks</h2>

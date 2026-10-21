@@ -5,6 +5,7 @@ import hr.algebra.project_manager.project.mapper.ProjectMapper;
 import hr.algebra.project_manager.project.repository.ProjectSummary;
 import hr.algebra.project_manager.project.service.InvalidLeadException;
 import hr.algebra.project_manager.project.service.ProjectService;
+import hr.algebra.project_manager.task.service.TaskRow;
 import hr.algebra.project_manager.task.service.TaskService;
 import hr.algebra.project_manager.user.service.UserService;
 import jakarta.validation.Valid;
@@ -18,6 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/projects")
@@ -122,7 +125,12 @@ public class ProjectPageController {
     public String getProjectDetails(@PathVariable Long id, Model model) {
         model.addAttribute("project", projectService.getProjectDetails(id));
 
-        model.addAttribute("tasks", taskService.findRows(id));
+        List<TaskRow> tasks = taskService.findRows(id);
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("doneCount",
+                tasks
+                        .stream()
+                .filter(task -> task.status() == WorkStatus.DONE).count());
         return DETAIL_VIEW;
     }
 

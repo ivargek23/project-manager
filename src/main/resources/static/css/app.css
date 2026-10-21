@@ -389,6 +389,15 @@ main {
 .project-description { margin: 16px 0 0; color: var(--text-secondary); }
 .task-section h2 { margin-bottom: 12px; }
 .task-sub { display: block; color: var(--text-secondary); font-size: 12px; line-height: 16px; }
+.header-actions { display: flex; gap: 12px; }
+.summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.summary-card { display: flex; flex-direction: column; gap: 6px; padding: 16px; }
+.summary-label { font-size: 12px; line-height: 16px; color: var(--text-secondary); }
+.summary-value { font-weight: 500; }
+.summary-value.muted { color: var(--text-secondary); font-weight: 400; }
+.summary-card progress { width: 100%; height: 6px; accent-color: var(--primary-default); }
+@media (max-width: 900px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .summary-cards { grid-template-columns: 1fr; } .header-actions { flex-direction: column; } }
 @media (max-width: 640px) {
     .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     .project-meta { gap: 16px; }
