@@ -20,7 +20,6 @@
 
     <th:block th:unless="${projects.totalElements == 0 and #strings.isEmpty(q) and status == null}">
 
-        <!-- Filters: a GET form, so the URL can be bookmarked and shared -->
         <form class="filters" method="get" th:action="@{/projects}">
             <div class="field">
                 <label for="q" th:text="#{project.search.label}">Search projects</label>
