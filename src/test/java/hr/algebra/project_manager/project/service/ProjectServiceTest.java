@@ -79,7 +79,7 @@ class ProjectServiceTest {
         when(users.findById(10L)).thenReturn(Optional.of(member));
         var cmd = command(10L);
 
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidLeadException.class)
                 .isThrownBy(() -> service.create(cmd))
                 .withMessageContaining("lead");
         verify(projects, never()).save(any());
