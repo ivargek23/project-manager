@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}">
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
 <head>
     <title th:text="${projectId == null} ? #{project.form.newTitle} : #{project.form.editTitle}">Project</title>
 </head>

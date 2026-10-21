@@ -25,6 +25,8 @@ public class ProjectPageController {
     private static final int PAGE_SIZE = 10;
     private static final Sort BY_NAME = Sort.by("name");
     private static final String FORM_VIEW = "project/form";
+    public static final String REDIRECT_TO_PROJECTS = "redirect:/projects";
+    private static final String MESSAGE_TYPE_SUCCESS = "successMessage";
 
     private final ProjectService projectService;
     private final UserService userService;
@@ -65,9 +67,9 @@ public class ProjectPageController {
         }
         try {
             projectService.create(projectMapper.toCommand(form));
-            attributes.addFlashAttribute("successMessage", "project.created");
-            return "redirect:/projects";
-        } catch (IllegalArgumentException e) {
+            attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "project.created");
+            return REDIRECT_TO_PROJECTS;
+        } catch (IllegalArgumentException _) {
             result.rejectValue("leadId", "project.lead.invalid");
             return showForm(model, null);
         }
@@ -93,12 +95,12 @@ public class ProjectPageController {
         }
         try {
             projectService.update(id, form.getVersion(), projectMapper.toCommand(form));
-            attributes.addFlashAttribute("successMessage", "project.updated");
-            return "redirect:/projects";
-        } catch (OptimisticLockingFailureException e) {
+            attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "project.updated");
+            return REDIRECT_TO_PROJECTS;
+        } catch (OptimisticLockingFailureException _) {
             result.reject("project.stale");
             return showForm(model, id);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             result.rejectValue("leadId", "project.lead.invalid");
             return showForm(model, id);
         }
@@ -108,8 +110,8 @@ public class ProjectPageController {
     public String delete(@PathVariable Long id,
                          RedirectAttributes attributes) {
         projectService.delete(id);
-        attributes.addFlashAttribute("successMessage", "project.deleted");
-        return "redirect:/projects";
+        attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "project.deleted");
+        return REDIRECT_TO_PROJECTS;
     }
 
     private void addFormOptions(Model model) {

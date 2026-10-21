@@ -18,8 +18,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -78,9 +77,11 @@ class ProjectServiceTest {
     @Test
     void createRefusesAMemberAsLead() {
         when(users.findById(10L)).thenReturn(Optional.of(member));
+        var cmd = command(10L);
 
-        assertThatThrownBy(() -> service.create(command(10L)))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> service.create(cmd))
+                .withMessageContaining("lead");
         verify(projects, never()).save(any());
     }
 
@@ -100,8 +101,9 @@ class ProjectServiceTest {
     void updateRefusesAStaleVersion() {
         Project project = new Project("Old name", START, DUE, lead);
         when(projects.findWithLeadById(1L)).thenReturn(Optional.of(project));
+        var cmd = command(2L);
 
-        assertThatThrownBy(() -> service.update(1L, 7L, command(2L)))
+        assertThatThrownBy(() -> service.update(1L, 7L, cmd))
                 .isInstanceOf(ObjectOptimisticLockingFailureException.class);
         assertThat(project.getName()).isEqualTo("Old name");
     }

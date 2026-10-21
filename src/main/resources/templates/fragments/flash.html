@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Flash messages fragment</title>
+</head>
 <body>
+...
 <div class="flash-area" th:fragment="flash">
 
-    <div class="flash flash-success" role="status" th:if="${successMessage}">
+    <output class="flash flash-success" th:if="${successMessage}">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
         </svg>
@@ -14,7 +18,7 @@
                 <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
             </svg>
         </button>
-    </div>
+    </output>
 
     <div class="flash flash-error" role="alert" th:if="${errorMessage}">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">

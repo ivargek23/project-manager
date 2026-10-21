@@ -24,6 +24,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuppressWarnings("java:S2160") // identity is the id, defined once in BaseEntity
 public class AppUser extends BaseEntity {
 
     @Id
