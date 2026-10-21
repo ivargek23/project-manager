@@ -66,11 +66,27 @@ public class ProjectService {
         projects.delete(project);
     }
 
+    @Transactional(readOnly = true)
+    public ProjectDetails getProjectDetails(Long id) {
+        Project project = get(id);
+        AppUser lead = project.getLead();
+
+        return new ProjectDetails(
+                project.getId(),
+                project.getName(),
+                project.getDescription(),
+                project.getStartDate(),
+                project.getDueDate(),
+                project.getStatus(),
+                lead == null ? null : lead.getDisplayName()
+        );
+    }
+
     private AppUser findLead(Long leadId) {
         AppUser lead = users.findById(leadId)
                 .orElseThrow(() -> new NotFoundException("User", leadId));
         if (!lead.isEnabled() || !Role.CAN_BE_A_PROJECT_LEAD.contains(lead.getRole())) {
-            throw new IllegalArgumentException("User " + leadId + " can't lead a project");
+            throw new InvalidLeadException(leadId);
         }
         return lead;
     }

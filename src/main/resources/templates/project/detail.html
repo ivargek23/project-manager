@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="${project.name}">Website Redesign</title>
+</head>
+<body>
+<main>
+    <nav class="breadcrumb" th:aria-label="#{breadcrumb.label}">
+        <a th:href="@{/projects}" th:text="#{project.list.title}">Projects</a>
+        <span aria-hidden="true">/</span>
+        <span th:text="${project.name}">Website Redesign</span>
+    </nav>
+
+    <div class="page-header">
+        <div class="title-with-chip">
+            <h1 th:text="${project.name}">Website Redesign</h1>
+            <span class="chip" th:classappend="'chip-' + ${project.status}"
+                  th:text="#{status.__${project.status}__}">In progress</span>
+        </div>
+        <a class="btn btn-secondary" th:href="@{/projects/{id}/edit(id=${project.id})}"
+           th:text="#{project.edit}">Edit project</a>
+    </div>
+
+    <section class="card project-summary">
+        <dl class="project-meta">
+            <div>
+                <dt th:text="#{project.field.lead}">Lead</dt>
+                <dd th:text="${project.leadName} ?: #{project.noLead}">Michael Chen</dd>
+            </div>
+            <div>
+                <dt th:text="#{project.field.startDate}">Start date</dt>
+                <dd th:text="${#temporals.format(project.startDate, #messages.msg('date.format'))}">01.09.2026.</dd>
+            </div>
+            <div>
+                <dt th:text="#{project.field.dueDate}">Due date</dt>
+                <dd th:text="${#temporals.format(project.dueDate, #messages.msg('date.format'))}">15.12.2026.</dd>
+            </div>
+        </dl>
+        <p class="project-description" th:if="${project.description}" th:text="${project.description}">
+            Redesign of the company website.</p>
+    </section>
+
+    <section class="task-section" aria-labelledby="tasks-heading">
+        <h2 id="tasks-heading" th:text="#{task.list.title}">Tasks</h2>
+
+        <div class="empty-state card" th:if="${#lists.isEmpty(tasks)}">
+            <p th:text="#{task.empty.text}">This project has no tasks yet.</p>
+        </div>
+
+        <table class="data-table" th:unless="${#lists.isEmpty(tasks)}">
+            <thead>
+            <tr>
+                <th scope="col" th:text="#{task.column.title}">Task</th>
+                <th scope="col" th:text="#{task.column.assignee}">Assignee</th>
+                <th scope="col" th:text="#{task.column.estimate}">Estimate</th>
+                <th scope="col" th:text="#{task.column.status}">Status</th>
+                <th scope="col" th:text="#{task.column.dependencies}">Dependencies</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${tasks}">
+                <td>
+                    <span th:text="${t.title}">Design homepage</span>
+                    <span class="task-sub" th:if="${t.subtaskCount > 0}"
+                          th:text="#{task.subtasks(${t.subtasksDone}, ${t.subtaskCount})}">1/2 subtasks</span>
+                </td>
+                <td th:text="${t.assigneeName} ?: #{task.unassigned}">Anna Kovač</td>
+                <td th:text="#{task.estimate.days(${t.estimateDays})}">3 days</td>
+                <td><span class="chip" th:classappend="'chip-' + ${t.status}"
+                          th:text="#{status.__${t.status}__}">To do</span></td>
+                <td th:text="${t.dependencyCount}">2</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

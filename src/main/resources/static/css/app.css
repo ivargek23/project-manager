@@ -379,3 +379,17 @@ main {
 .btn-danger:hover { background: var(--status-blocked-text); }
 .danger-zone { max-width: 640px; margin-top: 16px; display: flex; justify-content: flex-end; }
 /*************/
+
+/* Detail */
+.title-with-chip { display: flex; align-items: center; gap: 12px; }
+.project-summary { margin: 24px 0; }
+.project-meta { display: flex; flex-wrap: wrap; gap: 32px; margin: 0; }
+.project-meta dt { color: var(--text-secondary); font-size: 12px; line-height: 16px; }
+.project-meta dd { margin: 4px 0 0; font-weight: 500; }
+.project-description { margin: 16px 0 0; color: var(--text-secondary); }
+.task-section h2 { margin-bottom: 12px; }
+.task-sub { display: block; color: var(--text-secondary); font-size: 12px; line-height: 16px; }
+@media (max-width: 640px) {
+    .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .project-meta { gap: 16px; }
+}

@@ -3,7 +3,9 @@ package hr.algebra.project_manager.project.web;
 import hr.algebra.project_manager.common.WorkStatus;
 import hr.algebra.project_manager.project.mapper.ProjectMapper;
 import hr.algebra.project_manager.project.repository.ProjectSummary;
+import hr.algebra.project_manager.project.service.InvalidLeadException;
 import hr.algebra.project_manager.project.service.ProjectService;
+import hr.algebra.project_manager.task.service.TaskService;
 import hr.algebra.project_manager.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +27,13 @@ public class ProjectPageController {
     private static final int PAGE_SIZE = 10;
     private static final Sort BY_NAME = Sort.by("name");
     private static final String FORM_VIEW = "project/form";
-    public static final String REDIRECT_TO_PROJECTS = "redirect:/projects";
+    private static final String REDIRECT_TO_PROJECTS = "redirect:/projects";
     private static final String MESSAGE_TYPE_SUCCESS = "successMessage";
+    private static final String DETAIL_VIEW = "project/detail";
 
     private final ProjectService projectService;
     private final UserService userService;
+    private final TaskService taskService;
     private final ProjectMapper projectMapper;
 
     @GetMapping
@@ -66,10 +70,10 @@ public class ProjectPageController {
             return showForm(model, null);
         }
         try {
-            projectService.create(projectMapper.toCommand(form));
+            Long id = projectService.create(projectMapper.toCommand(form));
             attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "project.created");
-            return REDIRECT_TO_PROJECTS;
-        } catch (IllegalArgumentException _) {
+            return REDIRECT_TO_PROJECTS + "/" + id;
+        } catch (InvalidLeadException _) {
             result.rejectValue("leadId", "project.lead.invalid");
             return showForm(model, null);
         }
@@ -96,11 +100,11 @@ public class ProjectPageController {
         try {
             projectService.update(id, form.getVersion(), projectMapper.toCommand(form));
             attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "project.updated");
-            return REDIRECT_TO_PROJECTS;
+            return REDIRECT_TO_PROJECTS + "/" + id;
         } catch (OptimisticLockingFailureException _) {
             result.reject("project.stale");
             return showForm(model, id);
-        } catch (IllegalArgumentException _) {
+        } catch (InvalidLeadException _) {
             result.rejectValue("leadId", "project.lead.invalid");
             return showForm(model, id);
         }
@@ -112,6 +116,14 @@ public class ProjectPageController {
         projectService.delete(id);
         attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "project.deleted");
         return REDIRECT_TO_PROJECTS;
+    }
+
+    @GetMapping("/{id}")
+    public String getProjectDetails(@PathVariable Long id, Model model) {
+        model.addAttribute("project", projectService.getProjectDetails(id));
+
+        model.addAttribute("tasks", taskService.findRows(id));
+        return DETAIL_VIEW;
     }
 
     private void addFormOptions(Model model) {
