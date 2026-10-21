@@ -48,6 +48,7 @@
                 <th scope="col" th:text="#{project.column.dueDate}">Due date</th>
                 <th scope="col" th:text="#{project.column.status}">Status</th>
                 <th scope="col" th:text="#{project.column.tasks}">Tasks</th>
+                <th scope="col"><span class="visually-hidden" th:text="#{table.actions}">Actions</span></th>
             </tr>
             </thead>
             <tbody>
@@ -58,6 +59,25 @@
                 <td><span class="chip" th:classappend="'chip-' + ${p.status}"
                           th:text="#{status.__${p.status}__}">In progress</span></td>
                 <td th:text="${p.taskCount}">20</td>
+                <td>
+                    <div class="row-actions">
+                        <a class="icon-btn" th:href="@{/projects/{id}/edit(id=${p.id})}"
+                           th:aria-label="#{project.editNamed(${p.name})}" th:title="#{project.edit}">
+                            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>
+                            </svg>
+                        </a>
+                        <form method="post" th:action="@{/projects/{id}/delete(id=${p.id})}"
+                              th:data-confirm="#{project.delete.confirm(${p.name})}">
+                            <button class="icon-btn icon-btn-danger" type="submit"
+                                    th:aria-label="#{project.deleteNamed(${p.name})}" th:title="#{project.delete}">
+                                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>

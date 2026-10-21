@@ -13,5 +13,7 @@
 <div th:replace="~{fragments/flash :: flash}"></div>
 
 <main th:replace="${content}"></main>
+<dialog th:replace="~{fragments/confirm-dialog :: dialog}"></dialog>
+<script th:src="@{/js/confirm.js}" defer></script>
 </body>
 </html>
