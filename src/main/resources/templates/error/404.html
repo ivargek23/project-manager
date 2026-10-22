@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="#{error.404.title}">Page not found</title>
+</head>
+<body>
+<main>
+    <div class="empty-state card">
+        <h1 th:text="#{error.404.title}">Page not found</h1>
+        <p th:text="#{error.404.text}">The page or record you are looking for doesn't exist.</p>
+        <a class="btn btn-primary" th:href="@{/projects}" th:text="#{error.backToProjects}">Back to projects</a>
+    </div>
+</main>
+</body>
+</html>

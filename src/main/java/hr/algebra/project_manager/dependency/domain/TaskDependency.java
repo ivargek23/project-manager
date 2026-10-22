@@ -32,10 +32,6 @@ public class TaskDependency extends BaseEntity {
     @SequenceGenerator(name = "task_dependency_seq", sequenceName = "task_dependency_seq", allocationSize = 50)
     private Long id;
 
-    /**
-     * Copy of the tasks' project id. The composite foreign keys in V1 use it to guarantee
-     * that both tasks are in this project (see ADR 0001).
-     */
     @Column(name = "project_id", nullable = false)
     private Long projectId;
 

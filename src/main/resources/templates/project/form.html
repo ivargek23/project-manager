@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="${projectId == null} ? #{project.form.newTitle} : #{project.form.editTitle}">Project</title>
+</head>
+<body>
+<main>
+    <nav class="breadcrumb" th:aria-label="#{breadcrumb.label}">
+        <a th:href="@{/projects}" th:text="#{project.list.title}">Projects</a>
+        <span aria-hidden="true">/</span>
+        <span th:text="${projectId == null} ? #{project.form.newTitle} : #{project.form.editTitle}">New project</span>
+    </nav>
+
+    <h1 th:text="${projectId == null} ? #{project.form.newTitle} : #{project.form.editTitle}">New project</h1>
+
+    <form class="card form-card" method="post" th:object="${form}" novalidate
+          th:action="${projectId == null} ? @{/projects} : @{/projects/{id}(id=${projectId})}">
+
+        <div class="flash flash-error" role="alert" th:if="${#fields.hasErrors('*')}">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+            </svg>
+            <span th:if="${#fields.hasGlobalErrors()}" th:text="${#fields.globalErrors()[0]}">Stale</span>
+            <span th:unless="${#fields.hasGlobalErrors()}" th:text="#{form.hasErrors}">Please correct the highlighted fields.</span>
+        </div>
+
+        <input type="hidden" th:field="*{version}">
+
+        <div class="field" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
+            <label for="name" th:text="#{project.field.name}">Name</label>
+            <input type="text" id="name" th:field="*{name}" maxlength="150"
+                   th:attr="aria-invalid=${#fields.hasErrors('name')}, aria-describedby=${#fields.hasErrors('name')} ? 'name-error'">
+            <span id="name-error" class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
+            <label for="description" th:text="#{project.field.description}">Description</label>
+            <textarea th:field="*{description}" id="description" rows="4" maxlength="2000"></textarea>
+            <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Error</span>
+        </div>
+
+        <div class="field-row">
+            <div class="field" th:classappend="${#fields.hasErrors('startDate')} ? 'has-error'">
+                <label for="startDate" th:text="#{project.field.startDate}">Start date</label>
+                <input type="date" th:field="*{startDate}" id="startDate"
+                       th:attr="aria-invalid=${#fields.hasErrors('startDate')}, aria-describedby=${#fields.hasErrors('startDate')} ? 'startDate-error'">
+                <span id="startDate-error" class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}">Error</span>
+            </div>
+
+            <div class="field" th:classappend="${#fields.hasErrors('dueDate')} ? 'has-error'">
+                <label for="dueDate" th:text="#{project.field.dueDate}">Due date</label>
+                <input type="date" th:field="*{dueDate}" id="dueDate"
+                       th:attr="aria-invalid=${#fields.hasErrors('dueDate')}, aria-describedby=${#fields.hasErrors('dueDate')} ? 'dueDate-error'">
+                <span id="dueDate-error" class="field-error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}">Error</span>
+            </div>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('leadId')} ? 'has-error'">
+            <label for="leadId" th:text="#{project.field.lead}">Lead</label>
+            <select th:field="*{leadId}" id="leadId"
+                    th:attr="aria-invalid=${#fields.hasErrors('leadId')}, aria-describedby=${#fields.hasErrors('leadId')} ? 'leadId-error'">
+                <option value="" th:text="#{project.lead.choose}">Choose a person</option>
+                <option th:each="u : ${leads}" th:value="${u.id}" th:text="${u.displayName}">Michael Chen</option>
+            </select>
+            <span id="leadId-error" class="field-error" th:if="${#fields.hasErrors('leadId')}" th:errors="*{leadId}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('status')} ? 'has-error'">
+            <label for="status" th:text="#{project.field.status}">Status</label>
+            <select th:field="*{status}" id="status">
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="#{status.__${s}__}">To do</option>
+            </select>
+            <span class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">Error</span>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit" th:text="#{action.save}">Save project</button>
+            <a class="btn btn-secondary"
+               th:href="${projectId == null} ? @{/projects} : @{/projects/{id}(id=${projectId})}"
+               th:text="#{action.cancel}">Cancel</a>
+        </div>
+    </form>
+    <form class="danger-zone" method="post" th:if="${projectId != null}"
+          th:action="@{/projects/{id}/delete(id=${projectId})}"
+          th:data-confirm="#{project.delete.confirm(${form.name})}">
+        <button class="btn btn-danger" type="submit" th:text="#{project.delete}">Delete project</button>
+    </form>
+</main>
+</body>
+</html>

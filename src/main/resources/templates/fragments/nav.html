@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Navigation fragment</title>
+</head>
+<body>
+<header class="top-nav" th:fragment="nav">
+  <a class="brand" th:href="@{/projects}">Planner</a>
+
+  <nav class="nav-links" th:aria-label="#{nav.label}">
+    <ul>
+      <li><a th:href="@{/projects}" th:text="#{nav.projects}">Projects</a></li>
+      <li><a th:href="@{/my-tasks}" th:text="#{nav.myTasks}">My tasks</a></li>
+    </ul>
+  </nav>
+
+  <div class="lang-switch">
+    <a th:href="@{?lang=hr}" lang="hr">HR</a>
+    <span aria-hidden="true">|</span>
+    <a th:href="@{?lang=en}" lang="en">EN</a>
+  </div>
+</header>
+</body>
+</html>

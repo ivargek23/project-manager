@@ -30,6 +30,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuppressWarnings("java:S2160") // identity is the id, defined once in BaseEntity
 public class MeetingNote extends BaseEntity {
 
     @Id
