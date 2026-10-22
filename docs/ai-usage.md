@@ -6,17 +6,23 @@ not about the AI feature inside the application (see ADR 0003 for that) ![ADR-00
 
 ## Tools
 
-| Tool | Used for |
-|---|---|
-| Claude (claude.ai) | planning, domain model review, ADR drafts, wireframe instructions |
-| Figma AI agent | creating wireframe frames and high-fidelity screens from my prompts |
+| Tool               | Used for                                                                                                       |
+|--------------------|----------------------------------------------------------------------------------------------------------------|
+| Claude (claude.ai) | planning, domain model review, ADR drafts, wireframe instructions, reviewing my Java code                      |
+| Figma AI agent     | creating wireframe frames and high-fidelity screens from my prompts, organizing the Screens page into sections |
+| GitHub Copilot     | automatic review of pull requests                                                                              |
 
 ## Log
 
 ### Domain model (2026-10-11 – 2026-10-12)
-- **What I used AI for:** ...
-- **Prompts that mattered:** ...
-- **What I changed or rejected:** ...
+- **What I used AI for:** I drew the domain model in draw.io myself and asked Claude to review it against the requirements of the specification after each version.
+- **Prompts that mattered:**
+    - "Review my domain model against the specification: one-to-many, many-to-many with an association entity, optional relation."
+- **What I changed or rejected:**
+  - The reviews found relationship lines attached to the wrong classes, typos in names and missing fields. I fixed them myself in draw.io, over several rounds.
+  - Claude suggested two dependency types (finish-to-start and start-to-start). I kept only finish-to-start, because it is enough for the critical path and keeps the calculation simpler.
+  - Claude suggested a projectRole field on ProjectMember and an assignee on Subtask. I left both out to keep the model simpler. The role is already on the user (ADMIN, PROJECT_LEAD, MEMBER).
+  - Claude suggested estimates in hours. I changed them to working days on 2026-10-16, because the critical path and the prototype both work in days (see the update in ADR 0001).
 
 ### Architecture decision records (2026-10-12)
 ...
@@ -89,6 +95,74 @@ Page buttons: five squares of 32 × 32, no fill, stroke #9E9E9E, radius 4, start
 How to work with frames, rectangles, text, grouping and alignment in Figma, and why wireframes stay in greyscale: they settle the layout and navigation before any colours are chosen.
 Also, as I have never used Figma before, this was the first time I used Figma's AI agent as well and the more I used it, the better, more detailed and precise my prompts became. I learned that the AI agent is not perfect, and that I need to check the results carefully and correct them myself.
 
+### High-fidelity prototype (2026-10-13 – 2026-10-16)
+
+**What I used AI for:** I generated the high-fidelity screens with Figma's AI agent, from a prompt I wrote for each screen. Claude explained the Figma steps (variables, text styles, components with variants, auto layout, prototype connections) one at a time, and calculated the contrast ratios for my colour pairs.
+
+**What I did myself:**
+
+The colour variables, the text styles and the six components (button, input, select, status chip, table row, flash message), with variants and auto layout.
+I built the components before generating the screens on purpose, so that the AI would use them instead of drawing its own buttons and inputs. This mostly worked.
+
+**Prompts that mattered:**
+
+Project list:
+
+text
+`Desktop web app screen for a project management tool. Top navigation bar with app name "Planner", links "Projects" and "My tasks", language switch "HR | EN" and user avatar on the right. Page title "Projects" with a primary button "New project". Search field and a status filter dropdown above a data table. Table columns: Name, Lead, Status, Due date, Tasks. Eight rows with realistic project names. Pagination below the table. Clean, light, minimal, plenty of white space.
+`
+Meeting notes (AI feature screen):
+
+text
+`Fill this area with an AI meeting-notes feature, in two columns. Left column: the meeting notes text area, a character counter "2,431 / 10,000", "7 of 10 analyses left today" and a button "Extract tasks". Right column: "Suggested tasks", the line "AI suggestions — nothing is added to the plan until you accept it", and four suggestion cards with an editable title, assignee select, estimate, a quote from the notes, and "Accept" / "Dismiss". First card already accepted, third card with an assignee error "No project member matches "Marko"."
+`
+
+Similar prompts were used for the empty state, the task form, the project detail and the two mobile screens.
+
+**What I changed after the AI:**
+
+| Screen | Problem | What I did |
+|-----|-----|-----|-----|
+
+| Screen | Problem | What I did |
+|-----|-----|-----|-----|
+| Project list|Table header didn't line up with the columns |	Made the header a "Header" variant of my Table row component|
+|Project detail |Critical path said 34 days, but the tasks in the table add up to 32|Changed it to 32|
+|Project detail |	"Deps" column showed names of tasks, which overflowed the column |	Changed it to a count, the names are on the Dependencies tab|
+|Task form|	Estimate placeholder was "0", which is not a valid value	|Changed it to "e.g. 3"|
+|Task form (errors) |	Estimate showed "3" with the error "must be between 1 and 100"|	Changed the value to "0"|
+|Meeting notes |	The error card said "Marko", but Marko was not in the notes| Added Marko to the notes, so the case is realistic|
+|Meeting notes |	The accepted suggestion still looked editable|	Set its inputs to 50 % opacity|
+|Mobile form |	Cancel button was cut off|	Set the frame height to Hug|
+|All |	Input borders had only 1.45:1 contrast (found when Claude calculated the ratios) | Added border/input (#818B98, 3.45:1)|
+
+### Persistence layer (2026-10-16 – 2026-10-19)
+
+**GitHub Copilot review of the entities pull request (#56):**
+
+- It found an import of Spring's scheduling Task instead of my own Task entity, and missing AppUser imports. Both were real errors, and I fixed them.
+- It reported "invalid sequence names with spaces" in V2__seed_data.sql. This was a false positive, and V2 was already applied, so I didn't change it. An applied Flyway migration is never edited; a fix would go into a new migration.
+
+### Project screens, issue #19 (2026-10-19 – 2026-10-22)
+
+**How I worked:** I asked Claude to lead me through the issue when I would get stuck, to break the task down to steps and lead me one step at a time. I wrote the Java code myself and sent it to Claude for review. I did not use the generated zip files Claude offered with complete classes, because I want to be able to explain every class at the defence.
+
+**What I wrote myself:** `ProjectService`, `ProjectCommand`, `ProjectDetails`, `InvalidLeadException`, `ProjectForm`, the `@ValidDateRange` validator, `ProjectMapper`, the repository queries and the HR/EN validation messages.
+
+**What Claude wrote, at my request:**
+
+- parts of Thymeleaf templates based on my instruction and `app.css` file based on the colors I provided him based on Figma design.
+
+### Prototype update (2026-10-21 – 2026-10-22)
+
+**What I used AI for:** I asked Figma's AI agent to organize the Screens page, and it grouped the frames into sections (project lists, project details, task forms, meeting notes, mobile).
+
+**What I changed:**
+
+- Added the icon button and dialog components, the delete confirmation frame (01c), and edit and delete icons in the project list rows and mobile cards.
+- The review found buttons that had switched to the wrong variant, a missing gap in the task form with errors and a thin line above the table header. I fixed them before exporting the new `docs/prototype.pdf`.
+
+
 ## What I did without AI
 
 ### 1. Domain model
@@ -97,5 +171,9 @@ I developed and then drew in draw.io the domain model myself, without AI assista
 ### 2. Architecture decision records
 
 I envisioned the architecture decision records myself, and wrote them in markdown. I used AI to review them and suggest improvements. Then I drew the diagrams in draw.io myself, without AI assistance.
+
+### 3. Java code of the project screens
+
+The service, the form, the validator, the mapper and the repository queries for issue #19 are written by me. Claude only reviewed them.
 
 ## Reflection
