@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="#{error.generic.title}">Something went wrong</title>
+</head>
+<body>
+<main>
+    <div class="empty-state card">
+        <h1 th:text="#{error.generic.title}">Something went wrong</h1>
+        <p th:text="#{error.generic.text}">Please try again. If the problem continues, contact the administrator.</p>
+        <a class="btn btn-primary" th:href="@{/projects}" th:text="#{error.backToProjects}">Back to projects</a>
+    </div>
+</main>
+</body>
+</html>
