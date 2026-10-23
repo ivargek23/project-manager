@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="${taskId == null} ? #{task.form.newTitle} : #{task.form.editTitle}">Task</title>
+</head>
+<body>
+<main>
+    <nav class="breadcrumb" th:aria-label="#{breadcrumb.label}">
+        <a th:href="@{/projects}" th:text="#{project.list.title}">Projects</a>
+        <span aria-hidden="true">/</span>
+        <a th:href="@{/projects/{id}(id=${projectId})}" th:text="${projectName}">Website Redesign</a>
+        <span aria-hidden="true">/</span>
+        <span th:text="${taskId == null} ? #{task.form.newTitle} : #{task.form.editTitle}">New task</span>
+    </nav>
+
+    <h1 th:text="${taskId == null} ? #{task.form.newTitle} : #{task.form.editTitle}">New task</h1>
+
+    <form class="card form-card" method="post" th:object="${form}" novalidate
+          th:action="${taskId == null}
+                ? @{/projects/{p}/tasks(p=${projectId})}
+                : @{/projects/{p}/tasks/{t}(p=${projectId}, t=${taskId})}">
+
+        <div class="flash flash-error" role="alert" th:if="${#fields.hasErrors('*')}">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+            </svg>
+            <span th:if="${#fields.hasGlobalErrors()}" th:text="${#fields.globalErrors()[0]}">Stale</span>
+            <span th:unless="${#fields.hasGlobalErrors()}" th:text="#{form.hasErrors}">Please correct the highlighted fields.</span>
+        </div>
+
+        <input type="hidden" th:field="*{version}">
+
+        <div class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
+            <label for="title" th:text="#{task.field.title}">Title</label>
+            <input type="text" id="title" th:field="*{title}" maxlength="200"
+                   th:placeholder="#{task.title.placeholder}"
+                   th:attr="aria-invalid=${#fields.hasErrors('title')}, aria-describedby=${#fields.hasErrors('title')} ? 'title-error'">
+            <span id="title-error" class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
+            <label for="description" th:text="#{task.field.description}">Description</label>
+            <textarea id="description" th:field="*{description}" rows="4" maxlength="2000"
+                      th:placeholder="#{task.description.placeholder}"
+                      th:attr="aria-invalid=${#fields.hasErrors('description')}, aria-describedby=${#fields.hasErrors('description')} ? 'description-error'"></textarea>
+            <span id="description-error" class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('assigneeId')} ? 'has-error'">
+            <label for="assigneeId" th:text="#{task.field.assignee}">Assignee</label>
+            <select id="assigneeId" th:field="*{assigneeId}"
+                    th:attr="aria-invalid=${#fields.hasErrors('assigneeId')}, aria-describedby=${#fields.hasErrors('assigneeId')} ? 'assigneeId-error'">
+                <option value="" th:text="#{task.unassigned}">Unassigned</option>
+                <option th:each="u : ${assignees}" th:value="${u.id}" th:text="${u.displayName}">Emily Davis</option>
+            </select>
+            <span id="assigneeId-error" class="field-error" th:if="${#fields.hasErrors('assigneeId')}" th:errors="*{assigneeId}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('status')} ? 'has-error'">
+            <label for="status" th:text="#{task.field.status}">Status</label>
+            <select id="status" th:field="*{status}">
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="#{status.__${s}__}">To do</option>
+            </select>
+            <span class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('estimateDays')} ? 'has-error'">
+            <label for="estimateDays" th:text="#{task.field.estimateDays}">Estimate in working days</label>
+            <input type="number" id="estimateDays" th:field="*{estimateDays}" min="1" max="100" step="1"
+                   inputmode="numeric" th:placeholder="#{task.estimate.placeholder}"
+                   th:attr="aria-invalid=${#fields.hasErrors('estimateDays')}, aria-describedby=${#fields.hasErrors('estimateDays')} ? 'estimateDays-error'">
+            <span id="estimateDays-error" class="field-error" th:if="${#fields.hasErrors('estimateDays')}" th:errors="*{estimateDays}">Error</span>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('dueDate')} ? 'has-error'">
+            <label for="dueDate" th:text="#{task.field.dueDate}">Due date</label>
+            <input type="date" id="dueDate" th:field="*{dueDate}"
+                   th:attr="aria-invalid=${#fields.hasErrors('dueDate')}, aria-describedby=${#fields.hasErrors('dueDate')} ? 'dueDate-error'">
+            <span id="dueDate-error" class="field-error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}">Error</span>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit" th:text="#{task.save}">Save task</button>
+            <a class="btn btn-secondary" th:href="@{/projects/{id}(id=${projectId})}"
+               th:text="#{action.cancel}">Cancel</a>
+        </div>
+    </form>
+
+    <form class="danger-zone" method="post" th:if="${taskId != null}"
+          th:action="@{/projects/{p}/tasks/{t}/delete(p=${projectId}, t=${taskId})}"
+          th:data-confirm="#{task.delete.confirm(${form.title})}">
+        <button class="btn btn-danger" type="submit" th:text="#{task.delete}">Delete task</button>
+    </form>
+</main>
+</body>
+</html>
