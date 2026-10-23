@@ -162,6 +162,30 @@ Similar prompts were used for the empty state, the task form, the project detail
 - Added the icon button and dialog components, the delete confirmation frame (01c), and edit and delete icons in the project list rows and mobile cards.
 - The review found buttons that had switched to the wrong variant, a missing gap in the task form with errors and a thin line above the table header. I fixed them before exporting the new `docs/prototype.pdf`.
 
+### Task and subtask screens, issue #20 (2026-10-22 – 2026-10-23)
+
+**How I worked:**
+The same way as for #19: I asked Claude to break the task into steps, solved one at a time, and I sent my code for review after each step.
+
+**What I wrote myself:**
+`TaskForm`, `TaskCommand`, `TaskMapper`, `TaskService` (create, update, delete, the assignee check and the subtask methods), the queries in `ProjectMemberRepository`, `SubtaskForm`, `SubtaskRow`, and most of `TaskPageController`.
+
+**What Claude wrote, at my request:**
+- `task/form.html`, the edit and delete icons in the task table on the project detail page, and the CSS for the subtasks.
+
+**What Claude's reviews found in my code:**
+- `estimateDays` was a `LocalDate` instead of an `Integer`, and the message keys were missing the curly braces, so the user would have seen the key instead of the text.
+- The create, update and delete methods had no `@Transactional`, so they ran in the class-level read-only transaction and PostgreSQL would have rejected the inserts.
+- `createTask` and `updateTask` ignored the description, due date and assignee.
+- `setSubtaskDone` was called without the project id, and one subtask URL was `/subtask` instead of `/subtasks`.
+
+**What I changed or rejected:**
+- I wanted to put `@Builder` on `Task`. Claude explained that a class-level builder would bypass the constructor and the fields without setters, and ignore the field initializers unless they are marked `@Builder.Default`. I kept the constructor.
+- I wanted task editing in a pop-up instead of a page. I kept the page, because the subtasks live on the edit page, a long form in a dialog is cramped on mobile, and the validation errors work with the normal post-redirect-get flow.
+- An AI review of the controller suggested `@ModelAttribute` methods, `UriComponentsBuilder` and `@ExceptionHandler`. I didn't use them: `@ModelAttribute` methods run on every request, including the ones that only redirect, and an `@ExceptionHandler` can't show the form again with the user's input and the error under the field.
+- The task names didn't look clickable, so I asked for names in tables to use the link colour.
+- I started a rule that the due date can't be in the past, but postponed it after Claude pointed out it would block editing overdue tasks unless the check runs only when the date changes.
+- Two of Claude's controller tests had bugs: one sent the estimate parameter twice, so Spring used the first, valid value; and a new helper method had the same name as an existing one. Both were fixed.
 
 ## What I did without AI
 
