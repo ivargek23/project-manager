@@ -4,6 +4,7 @@ import hr.algebra.project_manager.common.WorkStatus;
 import hr.algebra.project_manager.project.service.ProjectService;
 import hr.algebra.project_manager.task.mapper.TaskMapper;
 import hr.algebra.project_manager.task.service.InvalidAssigneeException;
+import hr.algebra.project_manager.task.service.SubtaskForm;
 import hr.algebra.project_manager.task.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -94,9 +95,50 @@ public class TaskPageController {
         return REDIRECT_TO_PROJECT + projectId;
     }
 
+    @PostMapping("/{taskId}/subtasks")
+    public String addSubtask(@Valid @ModelAttribute("subtaskForm") SubtaskForm subtaskForm,
+                                 BindingResult result, Model model,
+                                 @PathVariable Long projectId,
+                                 @PathVariable Long taskId) {
+        if (result.hasErrors()) {
+            model.addAttribute("form", taskMapper.toForm(taskService.get(projectId, taskId)));
+            return showForm(model, projectId, taskId);
+        }
+        taskService.addSubtask(projectId, taskId, subtaskForm.getTitle());
+        return redirectToEdit(projectId, taskId);
+    }
+
+    @PostMapping("/{taskId}/subtasks/{subtaskId}/done")
+    public String setSubtaskDone(@PathVariable Long projectId,
+                                   @PathVariable Long taskId,
+                                   @PathVariable Long subtaskId,
+                                  @RequestParam boolean done) {
+        taskService.setSubtaskDone(projectId, taskId, subtaskId, done);
+        return redirectToEdit(projectId, taskId);
+    }
+
+    @PostMapping("/{taskId}/subtasks/{subtaskId}/delete")
+    public String deleteSubtask(@PathVariable Long projectId,
+                                 @PathVariable Long taskId,
+                                 @PathVariable Long subtaskId) {
+        taskService.deleteSubtask(projectId, taskId, subtaskId);
+        return redirectToEdit(projectId, taskId);
+    }
+
+    private String redirectToEdit(Long projectId, Long taskId) {
+        String editPath = projectId + "/tasks/" + taskId + "/edit";
+        return REDIRECT_TO_PROJECT.concat(editPath);
+    }
+
     private String showForm(Model model, Long projectId, Long taskId) {
         model.addAttribute("projectId", projectId);
         model.addAttribute("taskId", taskId);
+        if (taskId != null) {
+            model.addAttribute("subtasks", taskService.findSubtasks(projectId, taskId));
+            if (!model.containsAttribute("subtaskForm")) {
+                model.addAttribute("subtaskForm", new SubtaskForm());
+            }
+        }
         model.addAttribute("projectName", projectService.getProjectDetails(projectId).name());
         model.addAttribute("assignees", taskService.findAssigneeOptions(projectId));
         model.addAttribute("statuses", WorkStatus.values());

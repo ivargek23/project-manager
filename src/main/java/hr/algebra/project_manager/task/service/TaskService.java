@@ -98,6 +98,40 @@ public class TaskService {
         tasks.delete(task);
     }
 
+    @Transactional
+    public void addSubtask(Long projectId, Long taskId, String title) {
+        Task task = get(projectId, taskId);
+        task.addSubtask(title.strip());
+    }
+
+    @Transactional
+    public void setSubtaskDone(Long projectId, Long taskId, Long subtaskId, boolean done) {
+        Task task = get(projectId, taskId);
+        findSubtaskById(task, subtaskId).setDone(done);
+    }
+
+    @Transactional
+    public void deleteSubtask(Long projectId, Long taskId, Long subtaskId) {
+        Task task = get(projectId, taskId);
+        task.removeSubtask(findSubtaskById(task, subtaskId));
+    }
+
+    private Subtask findSubtaskById(Task task, Long subtaskId) {
+        return task.getSubtasks()
+                .stream()
+                .filter(subtask -> subtask.getId().equals(subtaskId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Subtask", subtaskId));
+    }
+
+    public List<SubtaskRow> findSubtasks(Long projectId, Long taskId) {
+        return get(projectId, taskId)
+                .getSubtasks()
+                .stream()
+                .map(subtask -> new SubtaskRow(subtask.getId(), subtask.getTitle(), subtask.isDone()))
+                .toList();
+    }
+
     private AppUser findAssignee(Long projectId, Long assigneeId) {
 
         if (assigneeId == null) return null;

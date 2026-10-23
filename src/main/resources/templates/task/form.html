@@ -87,6 +87,54 @@
         </div>
     </form>
 
+    <section class="card form-card subtask-card" th:if="${taskId != null}"
+             aria-labelledby="subtasks-heading">
+        <h2 id="subtasks-heading" th:text="#{subtask.list.title}">Subtasks</h2>
+
+        <p class="subtask-empty" th:if="${#lists.isEmpty(subtasks)}"
+           th:text="#{subtask.empty}">No subtasks yet.</p>
+
+        <ul class="subtask-list" th:unless="${#lists.isEmpty(subtasks)}">
+            <li class="subtask-item" th:each="s : ${subtasks}" th:classappend="${s.done} ? 'is-done'">
+                <form method="post"
+                      th:action="@{/projects/{p}/tasks/{t}/subtasks/{s}/done(p=${projectId}, t=${taskId}, s=${s.id})}">
+                    <input type="hidden" name="done" th:value="${!s.done}">
+                    <button class="icon-btn subtask-check" type="submit" th:attr="aria-pressed=${s.done}"
+                            th:aria-label="${s.done} ? #{subtask.markUndone(${s.title})} : #{subtask.markDone(${s.title})}">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect width="18" height="18" x="3" y="3" rx="2"/>
+                            <path th:if="${s.done}" d="m9 12 2 2 4-4"/>
+                        </svg>
+                    </button>
+                </form>
+                <span class="subtask-title" th:text="${s.title}">Write copy for hero</span>
+                <form method="post"
+                      th:action="@{/projects/{p}/tasks/{t}/subtasks/{s}/delete(p=${projectId}, t=${taskId}, s=${s.id})}">
+                    <button class="icon-btn icon-btn-danger" type="submit"
+                            th:aria-label="#{subtask.deleteNamed(${s.title})}" th:title="#{subtask.delete}">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                        </svg>
+                    </button>
+                </form>
+            </li>
+        </ul>
+
+        <form class="subtask-add" method="post" novalidate th:object="${subtaskForm}"
+              th:action="@{/projects/{p}/tasks/{t}/subtasks(p=${projectId}, t=${taskId})}">
+            <div class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
+                <label for="subtaskTitle" class="visually-hidden" th:text="#{subtask.field.title}">Subtask title</label>
+                <div class="subtask-add-row">
+                    <input type="text" id="subtaskTitle" th:field="*{title}" maxlength="200"
+                           th:placeholder="#{subtask.title.placeholder}"
+                           th:attr="aria-invalid=${#fields.hasErrors('title')}, aria-describedby=${#fields.hasErrors('title')} ? 'subtaskTitle-error'">
+                    <button class="btn btn-secondary" type="submit" th:text="#{subtask.add}">Add</button>
+                </div>
+                <span id="subtaskTitle-error" class="field-error" th:if="${#fields.hasErrors('title')}"
+                      th:errors="*{title}">Error</span>
+            </div>
+        </form>
+    </section>
     <form class="danger-zone" method="post" th:if="${taskId != null}"
           th:action="@{/projects/{p}/tasks/{t}/delete(p=${projectId}, t=${taskId})}"
           th:data-confirm="#{task.delete.confirm(${form.title})}">
