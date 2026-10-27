@@ -1,0 +1,30 @@
+username,method,url,body,expectedStatus
+# --- create project: admin and leads ---
+admin-t,POST,/projects,name=New&startDate=2026-11-02&dueDate=2026-12-01&leadId=9002&status=TODO,302
+lead1,POST,/projects,name=New&startDate=2026-11-02&dueDate=2026-12-01&leadId=9002&status=TODO,302
+member1,POST,/projects,name=New&startDate=2026-11-02&dueDate=2026-12-01&leadId=9002&status=TODO,403
+# --- edit / delete project: admin, or lead of THIS project ---
+lead1,POST,/projects/9101,name=Renamed&startDate=2026-11-02&dueDate=2026-12-18&leadId=9002&status=TODO&version=0,302
+lead2,POST,/projects/9101,name=Renamed&startDate=2026-11-02&dueDate=2026-12-18&leadId=9002&status=TODO&version=0,403
+admin-t,POST,/projects/9101/delete,,302
+member1,POST,/projects/9101/delete,,403
+# --- view project ---
+admin-t,GET,/projects/9101,,200
+lead1,GET,/projects/9101,,200
+member1,GET,/projects/9101,,200
+lead2,GET,/projects/9101,,403
+# --- create / delete task: lead of THIS project only ---
+lead1,POST,/projects/9101/tasks,title=New&estimateDays=2&status=TODO,302
+lead2,POST,/projects/9101/tasks,title=New&estimateDays=2&status=TODO,403
+member1,POST,/projects/9101/tasks,title=New&estimateDays=2&status=TODO,403
+admin-t,POST,/projects/9101/tasks,title=New&estimateDays=2&status=TODO,403
+lead1,POST,/projects/9101/tasks/9202/delete,,302
+member1,POST,/projects/9101/tasks/9201/delete,,403
+# --- subtasks: lead, or member on assigned tasks ---
+lead1,POST,/projects/9101/tasks/9202/subtasks,title=Step,302
+member1,POST,/projects/9101/tasks/9201/subtasks,title=Step,302
+member1,POST,/projects/9101/tasks/9202/subtasks,title=Step,403
+lead2,POST,/projects/9101/tasks/9201/subtasks,title=Step,403
+# --- task status: add when the status endpoint exists ---
+# member1,POST,/projects/9101/tasks/9201/status,status=IN_PROGRESS,302
+# member1,POST,/projects/9101/tasks/9202/status,status=IN_PROGRESS,403
