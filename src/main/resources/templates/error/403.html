@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="#{error.403.title}">Access denied</title>
+</head>
+<body>
+<main>
+    <h1 th:text="#{error.403.title}">Access denied</h1>
+    <p th:text="#{error.403.message}">You do not have permission to do this.</p>
+    <a class="btn btn-primary" th:href="@{/projects}" th:text="#{error.backToProjects}">Back to projects</a>
+</main>
+</body>
+</html>
