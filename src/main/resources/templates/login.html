@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
+<head>
+    <title th:text="#{login.title}">Sign in</title>
+</head>
+<body>
+<main>
+    <h1 th:text="#{login.title}">Sign in</h1>
+
+    <form class="card form-card" method="post" th:action="@{/login}">
+
+        <div class="flash flash-error" role="alert" th:if="${param.error}">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+            </svg>
+            <span th:text="#{login.error}">Invalid username or password.</span>
+        </div>
+
+        <output class="flash flash-success" th:if="${param.logout}">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span th:text="#{login.loggedOut}">You have been signed out.</span>
+        </output>
+
+        <div class="field">
+            <label for="username" th:text="#{login.username}">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username"
+                   autofocus required th:placeholder="#{login.username.placeholder}">
+        </div>
+
+        <div class="field">
+            <label for="password" th:text="#{login.password}">Password</label>
+            <input type="password" id="password" name="password"
+                   autocomplete="current-password" required th:placeholder="#{login.password.placeholder}">
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit" th:text="#{login.submit}">Sign in</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

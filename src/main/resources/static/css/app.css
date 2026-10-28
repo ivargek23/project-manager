@@ -121,6 +121,19 @@ main {
     text-decoration: none;
 }
 
+.logout-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding-left: 16px;
+    border-left: 1px solid var(--border-default);
+}
+
+.user-name {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
 /* Flash message */
 .flash-area {
     max-width: 1440px;
@@ -343,6 +356,15 @@ main {
 
     .btn {
         justify-content: center;
+    }
+
+    .logout-form {
+        padding-left: 0;
+        border-left: none;
+    }
+
+    .user-name {
+        display: none;
     }
 }
 

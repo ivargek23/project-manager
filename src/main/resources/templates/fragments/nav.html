@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
 <head>
-    <title>Navigation fragment</title>
+  <title>Navigation fragment</title>
 </head>
 <body>
 <header class="top-nav" th:fragment="nav">
   <a class="brand" th:href="@{/projects}">Planner</a>
 
-  <nav class="nav-links" th:aria-label="#{nav.label}">
+  <nav class="nav-links" th:aria-label="#{nav.label}" sec:authorize="isAuthenticated()">
     <ul>
       <li><a th:href="@{/projects}" th:text="#{nav.projects}">Projects</a></li>
       <li><a th:href="@{/my-tasks}" th:text="#{nav.myTasks}">My tasks</a></li>
@@ -19,6 +20,12 @@
     <span aria-hidden="true">|</span>
     <a th:href="@{?lang=en}" lang="en">EN</a>
   </div>
+
+  <form class="logout-form" method="post" th:action="@{/logout}"
+        sec:authorize="isAuthenticated()">
+    <span class="user-name" sec:authentication="principal.username">user</span>
+    <button class="btn btn-secondary" type="submit" th:text="#{nav.logout}">Sign out</button>
+  </form>
 </header>
 </body>
 </html>
