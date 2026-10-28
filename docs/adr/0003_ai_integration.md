@@ -15,6 +15,8 @@ There were some things that needed to be considered before the implementation co
 - In the deployed instance, the feature must work against the real provider, with a request cap, and the API key must never appear in the repository or in a response
 - A model call takes several seconds, can fail, and can return output that doesn't make sense. The application has to handle all of these cases
 
+A diagram showing AI integration is available in[`docs/adr/0003_ai_extraction_flow.drawio.svg`](../..//docs/adr/0003_ai_extraction_flow.drawio.svg).
+
 ## Decision
 
 ### 1. Google Gemini, free tier
