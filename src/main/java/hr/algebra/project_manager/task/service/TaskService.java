@@ -14,6 +14,7 @@ import hr.algebra.project_manager.user.repository.UserOption;
 import hr.algebra.project_manager.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ public class TaskService {
     private final ProjectRepository projects;
     private final UserRepository users;
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
     public List<TaskRow> findRows(Long projectId) {
         Map<Long, Long> dependencyCounts = graph
                 .findEdges(projectId)
@@ -53,15 +55,18 @@ public class TaskService {
                 )).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
     public Task get(Long projectId, Long taskId) {
         return tasks.findByIdAndProjectId(taskId, projectId).orElseThrow(() -> new NotFoundException("Task", taskId));
     }
 
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication)")
     public List<UserOption> findAssigneeOptions(Long projectId) {
         return projectMembers.findMemberOptions(projectId);
     }
 
     @Transactional
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication)")
     public Long createTask(Long projectId, TaskCommand cmd) {
         Project project = projects.findById(projectId).orElseThrow(() -> new NotFoundException("Project", projectId));
         Task task = new Task(
@@ -77,6 +82,7 @@ public class TaskService {
     }
 
     @Transactional
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication)")
     public void updateTask(Long projectId, Long taskId, Long expectedVersion, TaskCommand cmd) {
         Task task = get(projectId, taskId);
 
@@ -93,24 +99,28 @@ public class TaskService {
     }
 
     @Transactional
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication)")
     public void deleteTask(Long projectId, Long taskId) {
         Task task = get(projectId, taskId);
         tasks.delete(task);
     }
 
     @Transactional
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
     public void addSubtask(Long projectId, Long taskId, String title) {
         Task task = get(projectId, taskId);
         task.addSubtask(title.strip());
     }
 
     @Transactional
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
     public void setSubtaskDone(Long projectId, Long taskId, Long subtaskId, boolean done) {
         Task task = get(projectId, taskId);
         findSubtaskById(task, subtaskId).setDone(done);
     }
 
     @Transactional
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
     public void deleteSubtask(Long projectId, Long taskId, Long subtaskId) {
         Task task = get(projectId, taskId);
         task.removeSubtask(findSubtaskById(task, subtaskId));
@@ -124,6 +134,7 @@ public class TaskService {
                 .orElseThrow(() -> new NotFoundException("Subtask", subtaskId));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
     public List<SubtaskRow> findSubtasks(Long projectId, Long taskId) {
         return get(projectId, taskId)
                 .getSubtasks()

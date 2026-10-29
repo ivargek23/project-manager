@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +26,18 @@ public class ProjectService {
     private final ProjectRepository projects;
     private final UserRepository users;
 
+    @PreAuthorize("isAuthenticated()")
     public Page<ProjectSummary> search(String query, WorkStatus status, Pageable pageable) {
-        String text = query == null ? "" : query.strip();
-        return projects.search(text, status, pageable);
+        return projects.search((query == null ? "" : query.strip()), status, pageable);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication) or @projectAccess.isMember(#id, authentication)")
     public Project get(Long id) {
         return projects.findWithLeadById(id)
                 .orElseThrow(() -> new NotFoundException("Project", id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_LEAD')")
     @Transactional
     public Long create(ProjectCommand command) {
         Project project = new Project(command.name(), command.startDate(), command.dueDate(),
@@ -45,6 +48,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication)")
     public void update(Long id, Long expectedVersion, ProjectCommand command) {
         Project project = get(id);
         if (!Objects.equals(project.getVersion(), expectedVersion)) {
@@ -56,10 +60,10 @@ public class ProjectService {
         project.setDueDate(command.dueDate());
         project.setStatus(command.status());
         project.setLead(findLead(command.leadId()));
-        // no save(): the project is managed, so Hibernate writes the changes at commit
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication)")
     public void delete(Long id) {
         Project project = projects.findById(id)
                 .orElseThrow(() -> new NotFoundException("Project", id));
@@ -67,6 +71,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication) or @projectAccess.isMember(#id, authentication)")
     public ProjectDetails getProjectDetails(Long id) {
         Project project = get(id);
         AppUser lead = project.getLead();

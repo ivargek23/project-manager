@@ -35,4 +35,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @EntityGraph(attributePaths = "lead")
     Optional<Project> findWithLeadById(Long id);
+
+    boolean existsByIdAndLeadId(Long id, Long leadId);
 }
