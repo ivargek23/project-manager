@@ -1,10 +1,11 @@
 package hr.algebra.project_manager.project.service;
 
-import hr.algebra.project_manager.common.exception.NotFoundException;
 import hr.algebra.project_manager.common.WorkStatus;
+import hr.algebra.project_manager.common.exception.NotFoundException;
 import hr.algebra.project_manager.project.domain.Project;
 import hr.algebra.project_manager.project.repository.ProjectRepository;
 import hr.algebra.project_manager.project.repository.ProjectSummary;
+import hr.algebra.project_manager.security.AppUserPrincipal;
 import hr.algebra.project_manager.user.domain.AppUser;
 import hr.algebra.project_manager.user.domain.Role;
 import hr.algebra.project_manager.user.repository.UserRepository;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +31,13 @@ public class ProjectService {
 
     @PreAuthorize("isAuthenticated()")
     public Page<ProjectSummary> search(String query, WorkStatus status, Pageable pageable) {
-        return projects.search((query == null ? "" : query.strip()), status, pageable);
+        String q = query == null ? "" : query.strip();
+
+        AppUserPrincipal principal = getCurrentPrincipal();
+
+        if (principal.role() == Role.ADMIN) return projects.search(q, status, pageable);
+
+        return projects.searchVisibleTo(principal.id(), q, status, pageable);
     }
 
     @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication) or @projectAccess.isMember(#id, authentication)")
@@ -40,8 +49,12 @@ public class ProjectService {
     @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_LEAD')")
     @Transactional
     public Long create(ProjectCommand command) {
+        AppUserPrincipal current = getCurrentPrincipal();
+
+        Long leadId = current.role() == Role.ADMIN ? command.leadId() : current.id();
+        AppUser lead = findLead(leadId);
         Project project = new Project(command.name(), command.startDate(), command.dueDate(),
-                findLead(command.leadId()));
+                lead);
         project.setDescription(command.description());
         project.setStatus(command.status());
         return projects.save(project).getId();
@@ -51,6 +64,8 @@ public class ProjectService {
     @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication)")
     public void update(Long id, Long expectedVersion, ProjectCommand command) {
         Project project = get(id);
+        AppUserPrincipal principal = getCurrentPrincipal();
+        
         if (!Objects.equals(project.getVersion(), expectedVersion)) {
             throw new ObjectOptimisticLockingFailureException(Project.class, id);
         }
@@ -59,7 +74,9 @@ public class ProjectService {
         project.setStartDate(command.startDate());
         project.setDueDate(command.dueDate());
         project.setStatus(command.status());
-        project.setLead(findLead(command.leadId()));
+        if (principal.role() == Role.ADMIN) {
+            project.setLead(findLead(command.leadId()));
+        }
     }
 
     @Transactional
@@ -94,5 +111,13 @@ public class ProjectService {
             throw new InvalidLeadException(leadId);
         }
         return lead;
+    }
+
+    private AppUserPrincipal getCurrentPrincipal() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof AppUserPrincipal principal) {
+            return principal;
+        }
+        throw new IllegalStateException("No authenticated user in the security context");
     }
 }
