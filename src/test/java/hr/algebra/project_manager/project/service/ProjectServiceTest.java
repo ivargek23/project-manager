@@ -1,12 +1,15 @@
 package hr.algebra.project_manager.project.service;
 
-import hr.algebra.project_manager.common.exception.NotFoundException;
 import hr.algebra.project_manager.common.WorkStatus;
+import hr.algebra.project_manager.common.exception.NotFoundException;
 import hr.algebra.project_manager.project.domain.Project;
 import hr.algebra.project_manager.project.repository.ProjectRepository;
+import hr.algebra.project_manager.security.AppUserPrincipal;
 import hr.algebra.project_manager.user.domain.AppUser;
 import hr.algebra.project_manager.user.domain.Role;
 import hr.algebra.project_manager.user.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,15 +17,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
@@ -41,6 +44,20 @@ class ProjectServiceTest {
 
     private final AppUser lead = new AppUser("mchen", "Michael Chen", "hash", Role.PROJECT_LEAD);
     private final AppUser member = new AppUser("ahorvat", "Ana Horvat", "hash", Role.MEMBER);
+
+    private static final AppUserPrincipal ADMIN =
+            new AppUserPrincipal(1L, "admin", "hash", Role.ADMIN, true);
+
+    @BeforeEach
+    void logInAsAdmin() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(ADMIN, null, ADMIN.getAuthorities()));
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     private ProjectCommand command(Long leadId) {
         return new ProjectCommand("Website Redesign", "New site", START, DUE, leadId, WorkStatus.TODO);
