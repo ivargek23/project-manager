@@ -16,7 +16,6 @@ INSERT INTO project_member (id, project_id, user_id, allocation_percent) VALUES
 
 -- tasks
 INSERT INTO task (id, project_id, title, description, status, estimate_days, start_date, due_date, completed_at, assignee_id, created_at, version) VALUES
-    (9201, 1, 'Assigned task',     'Assigned to member1',     'TODO', 3, DATE '2026-11-02', DATE '2026-11-04', NULL, 9004, now(), 0),
-    (9202, 1, 'Unassigned task',   'Nobody is assigned',      'TODO', 2, DATE '2026-11-05', DATE '2026-11-06', NULL, NULL, now(), 0),
-    (9203, 2, 'Other project task','Belongs to lead2''s project', 'TODO', 1, DATE '2026-11-02', DATE '2026-11-02', NULL, NULL, now(), 0);
-
+    (9201, 9101, 'Assigned task',     'Assigned to member1',     'TODO', 3, DATE '2026-11-02', DATE '2026-11-04', NULL, 9004, now(), 0),
+    (9202, 9101, 'Unassigned task',   'Nobody is assigned',      'TODO', 2, DATE '2026-11-05', DATE '2026-11-06', NULL, NULL, now(), 0),
+    (9203, 9102, 'Other project task','Belongs to lead2''s project', 'TODO', 1, DATE '2026-11-02', DATE '2026-11-02', NULL, NULL, now(), 0);
