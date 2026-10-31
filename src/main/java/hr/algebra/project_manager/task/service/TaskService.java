@@ -1,5 +1,6 @@
 package hr.algebra.project_manager.task.service;
 
+import hr.algebra.project_manager.common.WorkStatus;
 import hr.algebra.project_manager.common.exception.NotFoundException;
 import hr.algebra.project_manager.dependency.repository.EdgeView;
 import hr.algebra.project_manager.dependency.repository.GraphQueryRepository;
@@ -141,6 +142,13 @@ public class TaskService {
                 .stream()
                 .map(subtask -> new SubtaskRow(subtask.getId(), subtask.getTitle(), subtask.isDone()))
                 .toList();
+    }
+
+    @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
+    @Transactional
+    public void updateStatus(Long projectId, Long taskId, WorkStatus status) {
+        Task task = get(projectId, taskId);
+        task.setStatus(status);
     }
 
     private AppUser findAssignee(Long projectId, Long assigneeId) {

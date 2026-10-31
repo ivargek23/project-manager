@@ -65,7 +65,7 @@ public class ProjectService {
     public void update(Long id, Long expectedVersion, ProjectCommand command) {
         Project project = get(id);
         AppUserPrincipal principal = getCurrentPrincipal();
-        
+
         if (!Objects.equals(project.getVersion(), expectedVersion)) {
             throw new ObjectOptimisticLockingFailureException(Project.class, id);
         }
