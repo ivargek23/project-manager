@@ -125,6 +125,14 @@ public class TaskPageController {
         return redirectToEdit(projectId, taskId);
     }
 
+    @PostMapping("/{taskId}/status")
+    public String updateStatus(@PathVariable Long projectId,
+                               @PathVariable Long taskId,
+                               @RequestParam WorkStatus status) {
+        taskService.updateStatus(projectId, taskId, status);
+        return REDIRECT_TO_PROJECT + projectId;
+    }
+
     private String redirectToEdit(Long projectId, Long taskId) {
         String editPath = projectId + "/tasks/" + taskId + "/edit";
         return REDIRECT_TO_PROJECT.concat(editPath);

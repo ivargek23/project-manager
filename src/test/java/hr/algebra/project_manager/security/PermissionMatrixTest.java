@@ -1,7 +1,6 @@
 package hr.algebra.project_manager.security;
 
 import hr.algebra.project_manager.TestcontainersConfiguration;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestcontainersConfiguration.class)
 @Transactional
 @Sql("/security/security-test-data.sql")
-@Disabled("Enforced in #24: method-level authorization")
 class PermissionMatrixTest {
 
     @Autowired

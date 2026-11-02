@@ -33,6 +33,36 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                 @Param("status") WorkStatus status,
                                 Pageable pageable);
 
+    @Query(value = """
+    SELECT NEW hr.algebra.project_manager.project.repository.ProjectSummary(
+                    p.id, p.name, l.displayName, p.dueDate, p.status, COUNT (t.id))
+                    FROM Project p
+                    JOIN p.lead l
+                    LEFT JOIN p.tasks t
+                    WHERE (:status IS NULL OR p.status = :status)
+                    AND lower(p.name) LIKE lower(concat('%', :query, '%'))
+                    AND (l.id = :userId
+                         OR EXISTS (SELECT pm FROM ProjectMember pm
+                                    WHERE pm.project = p AND pm.user.id = :userId))
+                    GROUP BY p.id, p.name, l.displayName, p.dueDate, p.status
+    """,
+            countQuery = """
+    SELECT count(p)
+    FROM Project p
+    JOIN p.lead l
+    WHERE (:status IS NULL OR p.status = :status)
+    AND lower(p.name) LIKE lower(concat('%', :query, '%'))
+    AND (l.id = :userId
+         OR EXISTS (SELECT pm FROM ProjectMember pm
+                    WHERE pm.project = p AND pm.user.id = :userId))
+    """)
+    Page<ProjectSummary> searchVisibleTo(@Param("userId") Long userId,
+                                         @Param("query") String query,
+                                         @Param("status") WorkStatus status,
+                                         Pageable pageable);
+
     @EntityGraph(attributePaths = "lead")
     Optional<Project> findWithLeadById(Long id);
+
+    boolean existsByIdAndLeadId(Long id, Long leadId);
 }
