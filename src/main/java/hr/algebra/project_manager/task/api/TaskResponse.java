@@ -23,7 +23,7 @@ public record TaskResponse(
         @Schema(description = "Estimated number of days to complete the task", example = "5")
         Integer estimateDays,
 
-        @Schema(description = "Due date of the task", example = "2023-05-15")
+        @Schema(description = "Due date of the task", example = "2026-05-15")
         LocalDate dueDate,
 
         @Schema(description = "ID of the assignee", example = "456")

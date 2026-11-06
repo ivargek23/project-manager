@@ -18,15 +18,16 @@ public record ProjectRequest(
         @Schema(description = "Description of the project", example = "Redesign the website to improve user experience")
         String description,
 
-        @Schema(description = "Start date of the project", example = "2023-01-01")
+        @Schema(description = "Start date of the project", example = "2026-01-01")
         @NotNull LocalDate startDate,
-        @Schema(description = "Due date of the project", example = "2023-01-31")
+        @Schema(description = "Due date of the project", example = "2026-01-31")
         @NotNull LocalDate dueDate,
         @Schema(description = "Status of the project", example = "IN_PROGRESS")
         @NotNull WorkStatus status,
-        @Schema(description = "Id of the project lead", example = "1")
+        @Schema(description = "Lead's user id. Only used when an admin creates or updates; ignored for project leads, who always lead their own projects.", example = "2")
         Long leadId,
-        @Schema(description = "Version of the project", example = "1")
+
+        @Schema(description = "Version from the last read. Required on update for the stale-version check; omit on create.", example = "0")
         Long version
         ) {
 }

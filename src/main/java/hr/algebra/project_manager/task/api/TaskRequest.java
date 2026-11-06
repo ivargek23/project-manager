@@ -25,7 +25,7 @@ public record TaskRequest(
         @Schema(description = "Due date of the task", example = "2023-01-01")
         LocalDate dueDate,
 
-        @Schema(description = "Version of the task", example = "1")
+        @Schema(description = "Version from the last read. Required on update for the stale-version check; omit on create.", example = "0")
         Long version
 ) {
 }

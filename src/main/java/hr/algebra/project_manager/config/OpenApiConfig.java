@@ -19,7 +19,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Project manager API")
                         .version("v1")
-                        .description("REST API for managing projects, tasks and subtasks."
+                        .description("REST API for managing projects, tasks and subtasks. "
                         + "Errors are returned as ProblemDetail (RFC 9457)."))
                 .components(new Components()
                         .addSecuritySchemes(BASIC_AUTH, new SecurityScheme()

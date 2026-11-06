@@ -17,9 +17,9 @@ public record ProjectResponse (
         @Schema(description = "Description of the project", example = "Redesign the website to improve user experience")
         String description,
 
-        @Schema(description = "Start date of the project", example = "2023-01-01")
+        @Schema(description = "Start date of the project", example = "2026-01-01")
         LocalDate startDate,
-        @Schema(description = "Due date of the project", example = "2023-01-31")
+        @Schema(description = "Due date of the project", example = "2026-01-31")
         LocalDate dueDate,
         @Schema(description = "Status of the project", example = "IN_PROGRESS")
         WorkStatus status,

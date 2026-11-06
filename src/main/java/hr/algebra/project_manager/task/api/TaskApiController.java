@@ -49,7 +49,7 @@ public class TaskApiController {
     })
     public PagedModel<TaskResponse> getTasks(
             @PathVariable Long projectId,
-            @ParameterObject @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "dueDate") Pageable pageable) {
         return new PagedModel<>(taskService.findPage(projectId, SortWhitelist.restrict(pageable, SORTABLE))
                 .map(taskMapper::toTaskResponse));
     }
