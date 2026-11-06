@@ -14,6 +14,8 @@ import hr.algebra.project_manager.user.domain.AppUser;
 import hr.algebra.project_manager.user.repository.UserOption;
 import hr.algebra.project_manager.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -158,5 +160,11 @@ public class TaskService {
         if (!projectMembers.existsByProjectIdAndUserId(projectId, assigneeId))
             throw new InvalidAssigneeException(assigneeId);
         return users.getReferenceById(assigneeId);
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public Page<Task> findPage(Long projectId, Pageable pageable) {
+        return tasks.findByProjectId(projectId, pageable);
     }
 }
