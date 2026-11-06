@@ -1,5 +1,6 @@
 package hr.algebra.project_manager.task.api;
 
+import hr.algebra.project_manager.common.validation.SortWhitelist;
 import hr.algebra.project_manager.task.mapper.TaskMapper;
 import hr.algebra.project_manager.task.service.TaskService;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/projects/{projectId}/tasks")
@@ -21,13 +23,14 @@ public class TaskApiController {
 
     private final TaskService taskService;
     private final TaskMapper taskMapper;
+    private static final Set<String> SORTABLE = Set.of("title", "dueDate", "status", "estimateDays");
 
     @GetMapping
     public PagedModel<TaskResponse> getTasks(
             @PathVariable Long projectId,
             @PageableDefault(size = 20, sort = "dueDate") Pageable pageable
     ) {
-        return new PagedModel<>(taskService.findPage(projectId, pageable)
+        return new PagedModel<>(taskService.findPage(projectId, SortWhitelist.restrict(pageable, SORTABLE))
                 .map(taskMapper::toTaskResponse));
     }
 

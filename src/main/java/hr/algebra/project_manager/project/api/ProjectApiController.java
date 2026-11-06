@@ -1,6 +1,7 @@
 package hr.algebra.project_manager.project.api;
 
 import hr.algebra.project_manager.common.WorkStatus;
+import hr.algebra.project_manager.common.validation.SortWhitelist;
 import hr.algebra.project_manager.project.mapper.ProjectMapper;
 import hr.algebra.project_manager.project.repository.ProjectSummary;
 import hr.algebra.project_manager.project.service.ProjectService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -23,13 +25,14 @@ import java.net.URI;
 public class ProjectApiController {
     private final ProjectService projectService;
     private final ProjectMapper projectMapper;
+    private static final Set<String> SORTABLE = Set.of("name", "dueDate", "status");
 
     @GetMapping
     public PagedModel<ProjectSummary> getProjects(
             @RequestParam(defaultValue = "") String q,
             @RequestParam(required = false) WorkStatus status,
             @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        return new PagedModel<>(projectService.search(q, status, pageable));
+        return new PagedModel<>(projectService.search(q, status, SortWhitelist.restrict(pageable, SORTABLE)));
     }
 
     @GetMapping("/{id}")

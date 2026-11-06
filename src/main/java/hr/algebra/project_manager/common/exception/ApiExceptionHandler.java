@@ -54,6 +54,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problem, headers, status, request);
     }
 
+    @ExceptionHandler(InvalidSortException.class)
+    public ProblemDetail handleInvalidSort(InvalidSortException ex) {
+        return problem(HttpStatus.BAD_REQUEST, "Invalid sort", ex.getMessage());
+    }
+
     private static ProblemDetail problem(HttpStatus status, String title, String detail) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
         problem.setTitle(title);
