@@ -64,6 +64,13 @@ public class Project {
     @Setter(AccessLevel.NONE)
     private List<ProjectMember> members = new ArrayList<>();
 
+    @Column(name = "schedule_version", nullable = false)
+    private long scheduleVersion;
+
+    public void bumpScheduleVersion() {
+        scheduleVersion++;
+    }
+
     public Project(String name, LocalDate startDate, LocalDate dueDate, AppUser lead) {
         this.name = name;
         this.startDate = startDate;
