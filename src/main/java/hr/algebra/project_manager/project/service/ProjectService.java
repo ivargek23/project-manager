@@ -106,7 +106,7 @@ public class ProjectService {
 
     private AppUser findLead(Long leadId) {
         AppUser lead = users.findById(leadId)
-                .orElseThrow(() -> new NotFoundException("User", leadId));
+                .orElseThrow(() -> new InvalidLeadException(leadId));
         if (!lead.isEnabled() || !Role.CAN_BE_A_PROJECT_LEAD.contains(lead.getRole())) {
             throw new InvalidLeadException(leadId);
         }

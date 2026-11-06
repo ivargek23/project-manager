@@ -51,3 +51,17 @@ All packages have some shared features, such as `common` (shared utilities), `co
 https://project-manager-i464.onrender.com
 
 Hosted on Render's free plan (Frankfurt) with a Neon PostgreSQL database (Frankfurt). The free service sleeps after about 15 minutes without traffic, so the first request after a pause can take about two minutes while the application starts.
+
+## REST API documentation
+
+- Deployed at: https://project-manager-i464.onrender.com/swagger-ui.html
+- Local URL: http://localhost:8084/swagger-ui.html
+- Raw OpenAPI JSON: `/v3/api-docs`
+
+**How to try it out**
+
+To test the endpoints, open Swagger UI at the URL listed above and then:
+1. click **Authorize** button and log in with a demo account (e.g. `pperic`, `Demo1234!`). That account is set to a project lead role.
+2. Try out the endpoints. Note that the `version` field is required on update for the stale-version check; omit it on create.
+
+> The API uses HTTP Basic and covers `/api/**` only; the screens use form login.
