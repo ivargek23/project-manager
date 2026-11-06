@@ -110,9 +110,11 @@ public class TaskService {
 
     @Transactional
     @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
-    public void addSubtask(Long projectId, Long taskId, String title) {
+    public Long addSubtask(Long projectId, Long taskId, String title) {
         Task task = get(projectId, taskId);
-        task.addSubtask(title.strip());
+        Subtask subtask = task.addSubtask(title.strip());
+        tasks.flush();
+        return subtask.getId();
     }
 
     @Transactional
@@ -144,6 +146,12 @@ public class TaskService {
                 .stream()
                 .map(subtask -> new SubtaskRow(subtask.getId(), subtask.getTitle(), subtask.isDone()))
                 .toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public SubtaskRow getSubtask(Long projectId, Long taskId, Long subtaskId) {
+        Subtask subtask = findSubtaskById(get(projectId, taskId), subtaskId);
+        return new SubtaskRow(subtask.getId(), subtask.getTitle(), subtask.isDone());
     }
 
     @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
