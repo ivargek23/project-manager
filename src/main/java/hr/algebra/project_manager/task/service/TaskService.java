@@ -14,6 +14,8 @@ import hr.algebra.project_manager.user.domain.AppUser;
 import hr.algebra.project_manager.user.repository.UserOption;
 import hr.algebra.project_manager.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -108,9 +110,11 @@ public class TaskService {
 
     @Transactional
     @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
-    public void addSubtask(Long projectId, Long taskId, String title) {
+    public Long addSubtask(Long projectId, Long taskId, String title) {
         Task task = get(projectId, taskId);
-        task.addSubtask(title.strip());
+        Subtask subtask = task.addSubtask(title.strip());
+        tasks.flush();
+        return subtask.getId();
     }
 
     @Transactional
@@ -144,6 +148,12 @@ public class TaskService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public SubtaskRow getSubtask(Long projectId, Long taskId, Long subtaskId) {
+        Subtask subtask = findSubtaskById(get(projectId, taskId), subtaskId);
+        return new SubtaskRow(subtask.getId(), subtask.getTitle(), subtask.isDone());
+    }
+
     @PreAuthorize("@projectAccess.isLead(#projectId, authentication) or @projectAccess.isAssignee(#projectId, #taskId, authentication)")
     @Transactional
     public void updateStatus(Long projectId, Long taskId, WorkStatus status) {
@@ -158,5 +168,11 @@ public class TaskService {
         if (!projectMembers.existsByProjectIdAndUserId(projectId, assigneeId))
             throw new InvalidAssigneeException(assigneeId);
         return users.getReferenceById(assigneeId);
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public Page<Task> findPage(Long projectId, Pageable pageable) {
+        return tasks.findByProjectId(projectId, pageable);
     }
 }
