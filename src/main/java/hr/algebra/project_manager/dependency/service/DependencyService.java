@@ -2,6 +2,7 @@ package hr.algebra.project_manager.dependency.service;
 
 import hr.algebra.project_manager.common.exception.NotFoundException;
 import hr.algebra.project_manager.dependency.domain.TaskDependency;
+import hr.algebra.project_manager.dependency.repository.DependencyRow;
 import hr.algebra.project_manager.dependency.repository.GraphQueryRepository;
 import hr.algebra.project_manager.dependency.repository.TaskDependencyRepository;
 import hr.algebra.project_manager.project.domain.Project;
@@ -75,6 +76,17 @@ public class DependencyService {
         Project project = lockProject(projectId);
         dependencyRepository.delete(findDependency(projectId, dependencyId));
         project.bumpScheduleVersion();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public List<DependencyRow> findDependencies(Long projectId) {
+        return dependencyRepository.findRows(projectId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public DependencyRow getDependency(Long projectId, Long dependencyId) {
+        return dependencyRepository.findRow(projectId, dependencyId)
+                .orElseThrow(() -> new NotFoundException("Dependency", dependencyId));
     }
 
     private Project lockProject(Long projectId) {
