@@ -1,9 +1,13 @@
 package hr.algebra.project_manager.common.exception;
 
+import hr.algebra.project_manager.dependency.service.CyclicDependencyException;
+import hr.algebra.project_manager.dependency.service.DuplicateDependencyException;
+import hr.algebra.project_manager.dependency.service.SelfDependencyException;
 import hr.algebra.project_manager.project.service.InvalidLeadException;
 import hr.algebra.project_manager.task.service.InvalidAssigneeException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,7 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import org.springframework.security.access.AccessDeniedException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -64,4 +67,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         problem.setTitle(title);
         return problem;
     }
+    @ExceptionHandler(CyclicDependencyException.class)
+    public ProblemDetail handleCycle(CyclicDependencyException ex) {
+        ProblemDetail problem = problem(HttpStatus.UNPROCESSABLE_CONTENT, "Dependency cycle", ex.getMessage());
+        problem.setProperty("cycle", ex.getCycle());
+        return problem;
+    }
+
+    @ExceptionHandler(SelfDependencyException.class)
+    public ProblemDetail handleSelfDependency(SelfDependencyException ex) {
+        return problem(HttpStatus.UNPROCESSABLE_CONTENT, "Invalid dependency", ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateDependencyException.class)
+    public ProblemDetail handleDuplicate(DuplicateDependencyException ex) {
+        return problem(HttpStatus.CONFLICT, "Duplicate dependency", ex.getMessage());
+    }
+
 }

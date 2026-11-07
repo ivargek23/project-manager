@@ -68,4 +68,12 @@ public class TaskDependency extends BaseEntity {
         this.successor = successor;
         this.lagDays = lagDays;
     }
+
+    public void relink(Task predecessor, Task successor) {
+        if (predecessor.getId().equals(successor.getId())) {
+            throw new IllegalArgumentException("A task can't depend on itself");
+        }
+        this.predecessor = predecessor;
+        this.successor = successor;
+    }
 }

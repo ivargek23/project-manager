@@ -4,8 +4,12 @@ import hr.algebra.project_manager.common.WorkStatus;
 import hr.algebra.project_manager.task.domain.Task;
 import hr.algebra.project_manager.user.domain.AppUser;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OptimisticLock;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -64,6 +68,7 @@ public class Project {
     @Setter(AccessLevel.NONE)
     private List<ProjectMember> members = new ArrayList<>();
 
+    @OptimisticLock(excluded = true)
     @Column(name = "schedule_version", nullable = false)
     private long scheduleVersion;
 
