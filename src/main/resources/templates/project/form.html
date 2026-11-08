@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{fragments/layout :: layout(~{::title}, ~{::main})}" lang="en">
 <head>
     <title th:text="${projectId == null} ? #{project.form.newTitle} : #{project.form.editTitle}">Project</title>
@@ -56,7 +57,9 @@
             </div>
         </div>
 
-        <div class="field" th:classappend="${#fields.hasErrors('leadId')} ? 'has-error'">
+        <!-- Only an admin chooses the lead; a project lead always leads their own projects -->
+        <div class="field" sec:authorize="hasRole('ADMIN')"
+             th:classappend="${#fields.hasErrors('leadId')} ? 'has-error'">
             <label for="leadId" th:text="#{project.field.lead}">Lead</label>
             <select th:field="*{leadId}" id="leadId"
                     th:attr="aria-invalid=${#fields.hasErrors('leadId')}, aria-describedby=${#fields.hasErrors('leadId')} ? 'leadId-error'">
@@ -65,6 +68,7 @@
             </select>
             <span id="leadId-error" class="field-error" th:if="${#fields.hasErrors('leadId')}" th:errors="*{leadId}">Error</span>
         </div>
+        <input type="hidden" sec:authorize="!hasRole('ADMIN')" th:field="*{leadId}">
 
         <div class="field" th:classappend="${#fields.hasErrors('status')} ? 'has-error'">
             <label for="status" th:text="#{project.field.status}">Status</label>
@@ -81,6 +85,7 @@
                th:text="#{action.cancel}">Cancel</a>
         </div>
     </form>
+
     <form class="danger-zone" method="post" th:if="${projectId != null}"
           th:action="@{/projects/{id}/delete(id=${projectId})}"
           th:data-confirm="#{project.delete.confirm(${form.name})}">

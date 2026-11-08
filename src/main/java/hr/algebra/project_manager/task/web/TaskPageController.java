@@ -1,6 +1,10 @@
 package hr.algebra.project_manager.task.web;
 
 import hr.algebra.project_manager.common.WorkStatus;
+import hr.algebra.project_manager.dependency.service.CyclicDependencyException;
+import hr.algebra.project_manager.dependency.service.DependencyService;
+import hr.algebra.project_manager.dependency.service.DuplicateDependencyException;
+import hr.algebra.project_manager.dependency.service.SelfDependencyException;
 import hr.algebra.project_manager.project.service.ProjectService;
 import hr.algebra.project_manager.task.mapper.TaskMapper;
 import hr.algebra.project_manager.task.service.InvalidAssigneeException;
@@ -22,6 +26,7 @@ public class TaskPageController {
 
     private final TaskService taskService;
     private final ProjectService projectService;
+    private final DependencyService dependencyService;
     private final TaskMapper taskMapper;
 
     private static final String TASK_FORM_VIEW = "task/form";
@@ -138,6 +143,41 @@ public class TaskPageController {
         return REDIRECT_TO_PROJECT.concat(editPath);
     }
 
+    @PostMapping("/{taskId}/dependencies")
+    public String addDependency(@PathVariable Long projectId,
+                                @PathVariable Long taskId,
+                                @Valid @ModelAttribute("dependencyForm") DependencyForm dependencyForm,
+                                BindingResult result,
+                                Model model,
+                                RedirectAttributes attributes) {
+        if (!result.hasErrors()) {
+            try {
+                dependencyService.addDependency(projectId, dependencyForm.getPredecessorId(), taskId,
+                        dependencyForm.getLagDays());
+                attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "dependency.added");
+                return redirectToEdit(projectId, taskId);
+            } catch (CyclicDependencyException e) {
+                result.reject("dependency.cycle", new Object[]{String.join(" → ", e.getCycle())}, null);
+            } catch (DuplicateDependencyException _) {
+                result.reject("dependency.duplicate");
+            } catch (SelfDependencyException _) {
+                result.reject("dependency.self");
+            }
+        }
+        model.addAttribute("form", taskMapper.toForm(taskService.get(projectId, taskId)));
+        return showForm(model, projectId, taskId);
+    }
+
+    @PostMapping("/{taskId}/dependencies/{dependencyId}/delete")
+    public String deleteDependency(@PathVariable Long projectId,
+                                   @PathVariable Long taskId,
+                                   @PathVariable Long dependencyId,
+                                   RedirectAttributes attributes) {
+        dependencyService.deleteDependency(projectId, dependencyId);
+        attributes.addFlashAttribute(MESSAGE_TYPE_SUCCESS, "dependency.deleted");
+        return redirectToEdit(projectId, taskId);
+    }
+
     private String showForm(Model model, Long projectId, Long taskId) {
         model.addAttribute("projectId", projectId);
         model.addAttribute("taskId", taskId);
@@ -150,6 +190,12 @@ public class TaskPageController {
         model.addAttribute("projectName", projectService.getProjectDetails(projectId).name());
         model.addAttribute("assignees", taskService.findAssigneeOptions(projectId));
         model.addAttribute("statuses", WorkStatus.values());
+
+        model.addAttribute("predecessors", dependencyService.findPredecessors(projectId, taskId));
+        model.addAttribute("predecessorOptions", taskService.findRows(projectId));
+        if (!model.containsAttribute("dependencyForm"))
+            model.addAttribute("dependencyForm", new DependencyForm());
+
         return TASK_FORM_VIEW;
     }
 }

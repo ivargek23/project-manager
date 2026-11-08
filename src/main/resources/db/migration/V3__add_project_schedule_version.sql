@@ -1,0 +1,2 @@
+ALTER TABLE project
+    ADD COLUMN schedule_version BIGINT NOT NULL DEFAULT 0;

@@ -28,3 +28,10 @@ lead2,POST,/projects/9101/tasks/9201/subtasks,title=Step,403
 # --- task status: add when the status endpoint exists ---
 # member1,POST,/projects/9101/tasks/9201/status,status=IN_PROGRESS,302
 # member1,POST,/projects/9101/tasks/9202/status,status=IN_PROGRESS,403
+member1,GET,/projects/9101/edit,,403
+
+# --- add dependency: only the lead of THIS project ---
+lead1,POST,/projects/9101/tasks/9202/dependencies,predecessorId=9201&lagDays=0,302
+lead2,POST,/projects/9101/tasks/9202/dependencies,predecessorId=9201&lagDays=0,403
+member1,POST,/projects/9101/tasks/9202/dependencies,predecessorId=9201&lagDays=0,403
+admin-t,POST,/projects/9101/tasks/9202/dependencies,predecessorId=9201&lagDays=0,403

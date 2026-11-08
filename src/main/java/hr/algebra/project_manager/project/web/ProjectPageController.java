@@ -87,6 +87,7 @@ public class ProjectPageController {
                               Model model) {
         model.addAttribute("form", projectMapper.toForm(projectService.get(id)));
         model.addAttribute("projectId", id);
+        model.addAttribute("form", projectMapper.toForm(projectService.getForEdit(id)));
         addFormOptions(model);
         return FORM_VIEW;
     }

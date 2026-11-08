@@ -13,6 +13,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @EntityGraph(attributePaths = "assignee")
     Page<Task> findByProjectId(Long projectId, Pageable pageable);
+    @EntityGraph(attributePaths = "assignee")
     Optional<Task> findByIdAndProjectId(Long id, Long projectId);
     List<Task> findByProjectIdOrderById(Long projectId);
     boolean existsByIdAndProjectIdAndAssigneeId(Long taskId, Long projectId, Long assigneeId);
