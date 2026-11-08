@@ -6,6 +6,7 @@ import hr.algebra.project_manager.dependency.service.DependencyService;
 import hr.algebra.project_manager.project.domain.Project;
 import hr.algebra.project_manager.project.service.ProjectDetails;
 import hr.algebra.project_manager.project.service.ProjectService;
+import hr.algebra.project_manager.security.ProjectAccess;
 import hr.algebra.project_manager.task.domain.Task;
 import hr.algebra.project_manager.task.mapper.TaskMapperImpl;
 import hr.algebra.project_manager.task.service.InvalidAssigneeException;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -32,13 +34,18 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskPageController.class)
 @Import(TaskMapperImpl.class)
+@WithMockUser
 class TaskPageControllerTest {
+
+    @MockitoBean(name = "projectAccess")
+    private ProjectAccess projectAccess;
 
     private static final String FORM_VIEW = "task/form";
 
@@ -75,7 +82,7 @@ class TaskPageControllerTest {
 
     @Test
     void validTaskIsCreatedAndRedirectsToProject() throws Exception {
-        mvc.perform(validTask(post("/projects/1/tasks")))
+        mvc.perform(validTask(post("/projects/1/tasks")).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/projects/1"))
                 .andExpect(flash().attribute("successMessage", "task.created"));
@@ -86,7 +93,7 @@ class TaskPageControllerTest {
 
     @Test
     void emptyFormIsShownAgainWithErrors() throws Exception {
-        mvc.perform(post("/projects/1/tasks"))
+        mvc.perform(post("/projects/1/tasks").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(FORM_VIEW))
                 .andExpect(model().attributeHasFieldErrors("form", "title", "estimateDays"));
@@ -96,11 +103,11 @@ class TaskPageControllerTest {
 
     @Test
     void estimateOutsideOneToHundredIsRejected() throws Exception {
-        mvc.perform(taskRequest(post("/projects/1/tasks"), "0"))
+        mvc.perform(taskRequest(post("/projects/1/tasks").with(csrf()), "0"))
                 .andExpect(view().name(FORM_VIEW))
                 .andExpect(model().attributeHasFieldErrorCode("form", "estimateDays", "Min"));
 
-        mvc.perform(taskRequest(post("/projects/1/tasks"), "101"))
+        mvc.perform(taskRequest(post("/projects/1/tasks").with(csrf()), "101"))
                 .andExpect(view().name(FORM_VIEW))
                 .andExpect(model().attributeHasFieldErrorCode("form", "estimateDays", "Max"));
 
@@ -111,7 +118,7 @@ class TaskPageControllerTest {
     void invalidAssigneeBecomesAFieldError() throws Exception {
         when(taskService.createTask(eq(1L), any())).thenThrow(new InvalidAssigneeException(99L));
 
-        mvc.perform(validTask(post("/projects/1/tasks")).param("assigneeId", "99"))
+        mvc.perform(validTask(post("/projects/1/tasks").with(csrf())).param("assigneeId", "99"))
                 .andExpect(view().name(FORM_VIEW))
                 .andExpect(model().attributeHasFieldErrorCode("form", "assigneeId", "task.assignee.invalid"));
     }
@@ -142,7 +149,7 @@ class TaskPageControllerTest {
 
     @Test
     void validUpdateRedirectsToProject() throws Exception {
-        mvc.perform(validTask(post("/projects/1/tasks/5")).param("version", "3"))
+        mvc.perform(validTask(post("/projects/1/tasks/5")).with(csrf()).param("version", "3"))
                 .andExpect(redirectedUrl("/projects/1"))
                 .andExpect(flash().attribute("successMessage", "task.updated"));
 
@@ -154,7 +161,7 @@ class TaskPageControllerTest {
         doThrow(new ObjectOptimisticLockingFailureException(Task.class, 5L))
                 .when(taskService).updateTask(eq(1L), eq(5L), eq(3L), any());
 
-        mvc.perform(validTask(post("/projects/1/tasks/5")).param("version", "3"))
+        mvc.perform(validTask(post("/projects/1/tasks/5")).with(csrf()).param("version", "3"))
                 .andExpect(view().name(FORM_VIEW))
                 .andExpect(model().attribute("taskId", 5L))
                 .andExpect(result -> {
@@ -166,7 +173,7 @@ class TaskPageControllerTest {
 
     @Test
     void deleteRedirectsToProjectWithFlash() throws Exception {
-        mvc.perform(post("/projects/1/tasks/5/delete"))
+        mvc.perform(post("/projects/1/tasks/5/delete").with(csrf()))
                 .andExpect(redirectedUrl("/projects/1"))
                 .andExpect(flash().attribute("successMessage", "task.deleted"));
 
@@ -175,7 +182,7 @@ class TaskPageControllerTest {
 
     @Test
     void validSubtaskIsAddedAndRedirectsToEditPage() throws Exception {
-        mvc.perform(post("/projects/1/tasks/5/subtasks").param("title", "Write copy"))
+        mvc.perform(post("/projects/1/tasks/5/subtasks").with(csrf()).param("title", "Write copy"))
                 .andExpect(redirectedUrl("/projects/1/tasks/5/edit"));
 
         verify(taskService).addSubtask(1L, 5L, "Write copy");
@@ -185,7 +192,7 @@ class TaskPageControllerTest {
     void emptySubtaskShowsTheErrorAndKeepsTheTaskForm() throws Exception {
         when(taskService.get(1L, 5L)).thenReturn(task());
 
-        mvc.perform(post("/projects/1/tasks/5/subtasks").param("title", " "))
+        mvc.perform(post("/projects/1/tasks/5/subtasks").with(csrf()).param("title", " "))
                 .andExpect(status().isOk())
                 .andExpect(view().name(FORM_VIEW))
                 .andExpect(model().attributeHasFieldErrors("subtaskForm", "title"))
@@ -196,7 +203,7 @@ class TaskPageControllerTest {
 
     @Test
     void subtaskIsMarkedDone() throws Exception {
-        mvc.perform(post("/projects/1/tasks/5/subtasks/7/done").param("done", "true"))
+        mvc.perform(post("/projects/1/tasks/5/subtasks/7/done").with(csrf()).param("done", "true"))
                 .andExpect(redirectedUrl("/projects/1/tasks/5/edit"));
 
         verify(taskService).setSubtaskDone(1L, 5L, 7L, true);
@@ -204,7 +211,7 @@ class TaskPageControllerTest {
 
     @Test
     void subtaskIsDeleted() throws Exception {
-        mvc.perform(post("/projects/1/tasks/5/subtasks/7/delete"))
+        mvc.perform(post("/projects/1/tasks/5/subtasks/7/delete").with(csrf()))
                 .andExpect(redirectedUrl("/projects/1/tasks/5/edit"));
 
         verify(taskService).deleteSubtask(1L, 5L, 7L);
