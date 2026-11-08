@@ -2,6 +2,7 @@ package hr.algebra.project_manager.task.web;
 
 import hr.algebra.project_manager.common.WorkStatus;
 import hr.algebra.project_manager.common.exception.NotFoundException;
+import hr.algebra.project_manager.dependency.service.DependencyService;
 import hr.algebra.project_manager.project.domain.Project;
 import hr.algebra.project_manager.project.service.ProjectDetails;
 import hr.algebra.project_manager.project.service.ProjectService;
@@ -29,21 +30,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskPageController.class)
 @Import(TaskMapperImpl.class)
@@ -59,6 +50,9 @@ class TaskPageControllerTest {
 
     @MockitoBean
     private ProjectService projectService;
+
+    @MockitoBean
+    private DependencyService dependencyService;
 
     @BeforeEach
     void setUp() {

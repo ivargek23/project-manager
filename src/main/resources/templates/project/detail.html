@@ -5,7 +5,8 @@
     <title th:text="${project.name}">Website Redesign</title>
 </head>
 <body>
-<main>
+<main th:with="canEditProject=${#authorization != null and #authorization.expression('hasRole(''ADMIN'') or @projectAccess.isLead(' + project.id + ', authentication)')},
+               isLead=${#authorization != null and #authorization.expression('@projectAccess.isLead(' + project.id + ', authentication)')}">
     <nav class="breadcrumb" th:aria-label="#{breadcrumb.label}">
         <a th:href="@{/projects}" th:text="#{project.list.title}">Projects</a>
         <span aria-hidden="true">/</span>
@@ -18,9 +19,11 @@
             <span class="chip" th:classappend="'chip-' + ${project.status}"
                   th:text="#{status.__${project.status}__}">In progress</span>
         </div>
-        <div class="header-actions">
-            <a class="btn btn-secondary" th:href="@{/projects/{id}/edit(id=${project.id})}" th:text="#{project.edit}">Edit project</a>
-            <a class="btn btn-primary" th:href="@{/projects/{id}/tasks/new(id=${project.id})}" th:text="#{task.add}">Add task</a>
+        <div class="header-actions" th:if="${canEditProject or isLead}">
+            <a class="btn btn-secondary" th:if="${canEditProject}"
+               th:href="@{/projects/{id}/edit(id=${project.id})}" th:text="#{project.edit}">Edit project</a>
+            <a class="btn btn-primary" th:if="${isLead}"
+               th:href="@{/projects/{id}/tasks/new(id=${project.id})}" th:text="#{task.add}">Add task</a>
         </div>
     </div>
 
@@ -66,14 +69,15 @@
                 <th scope="col" th:text="#{task.column.estimate}">Estimate</th>
                 <th scope="col" th:text="#{task.column.status}">Status</th>
                 <th scope="col" th:text="#{task.column.dependencies}">Dependencies</th>
-                <th scope="col"><span class="visually-hidden" th:text="#{table.actions}">Actions</span></th>
+                <th scope="col" th:if="${isLead}"><span class="visually-hidden" th:text="#{table.actions}">Actions</span></th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="t : ${tasks}">
                 <td class="cell-name">
-                    <a th:href="@{/projects/{p}/tasks/{t}/edit(p=${project.id}, t=${t.id})}"
+                    <a th:if="${isLead}" th:href="@{/projects/{p}/tasks/{t}/edit(p=${project.id}, t=${t.id})}"
                        th:text="${t.title}">Design homepage</a>
+                    <span th:unless="${isLead}" th:text="${t.title}">Design homepage</span>
                     <span class="task-sub" th:if="${t.subtaskCount > 0}"
                           th:text="#{task.subtasks(${t.subtasksDone}, ${t.subtaskCount})}">1/2 subtasks</span>
                 </td>
@@ -87,10 +91,10 @@
                 </td>
                 <td class="cell-meta" th:attr="data-label=#{task.column.dependencies}"
                     th:text="${t.dependencyCount}">2</td>
-                <td class="cell-actions">
+                <td class="cell-actions" th:if="${isLead}">
                     <div class="row-actions">
                         <a class="icon-btn" th:href="@{/projects/{p}/tasks/{t}/edit(p=${project.id}, t=${t.id})}"
-                           th:aria-label="#{task.editNamed(${t.title})}" th:title="#{task.edit}" aria-label="#{task.editNamed(${t.title})}">
+                           th:aria-label="#{task.editNamed(${t.title})}" th:title="#{task.edit}">
                             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>
                             </svg>

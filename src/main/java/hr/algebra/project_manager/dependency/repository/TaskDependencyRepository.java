@@ -20,4 +20,7 @@ public interface TaskDependencyRepository extends JpaRepository<TaskDependency, 
 
     @Query(TaskDependencyQueries.FIND_ROW)
     Optional<DependencyRow> findRow(@Param("projectId") Long projectId, @Param("id") Long id);
+
+    @Query(TaskDependencyQueries.FIND_PREDECESSOR_ROWS)
+    List<DependencyRow> findPredecessorRows(@Param("projectId") Long projectId, @Param("taskId") Long taskId);
 }

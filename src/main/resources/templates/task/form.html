@@ -135,6 +135,67 @@
             </div>
         </form>
     </section>
+    <section class="card form-card dependency-card" th:if="${taskId != null}"
+             th:with="isLead=${#authorization != null and #authorization.expression('@projectAccess.isLead(' + projectId + ', authentication)')}"
+             aria-labelledby="dependencies-heading">
+        <h2 id="dependencies-heading" th:text="#{dependency.list.title}">Waits for</h2>
+
+        <p class="dependency-empty" th:if="${#lists.isEmpty(predecessors)}"
+           th:text="#{dependency.empty}">This task doesn't wait for any other task.</p>
+
+        <ul class="dependency-list" th:unless="${#lists.isEmpty(predecessors)}">
+            <li class="dependency-item" th:each="d : ${predecessors}">
+                <span class="dependency-title" th:text="${d.predecessorTitle}">Information architecture</span>
+                <span class="dependency-lag" th:text="#{dependency.lag(${d.lagDays})}">no lag</span>
+                <form method="post" th:if="${isLead}"
+                      th:action="@{/projects/{p}/tasks/{t}/dependencies/{d}/delete(p=${projectId}, t=${taskId}, d=${d.id})}">
+                    <button class="icon-btn icon-btn-danger" type="submit"
+                            th:aria-label="#{dependency.deleteNamed(${d.predecessorTitle})}"
+                            th:title="#{dependency.delete}">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                        </svg>
+                    </button>
+                </form>
+            </li>
+        </ul>
+
+        <form class="dependency-add" method="post" novalidate th:if="${isLead}" th:object="${dependencyForm}"
+              th:action="@{/projects/{p}/tasks/{t}/dependencies(p=${projectId}, t=${taskId})}">
+
+            <div class="flash flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+                </svg>
+                <span th:text="${#fields.globalErrors()[0]}">This link would create a cycle: Design → Build → Design</span>
+            </div>
+
+            <div class="dependency-add-row">
+                <div class="field" th:classappend="${#fields.hasErrors('predecessorId')} ? 'has-error'">
+                    <label for="predecessorId" th:text="#{dependency.field.predecessor}">Task</label>
+                    <select id="predecessorId" th:field="*{predecessorId}"
+                            th:attr="aria-invalid=${#fields.hasErrors('predecessorId')}, aria-describedby=${#fields.hasErrors('predecessorId')} ? 'predecessorId-error'">
+                        <option value="" th:text="#{dependency.predecessor.placeholder}">Choose a task</option>
+                        <option th:each="t : ${predecessorOptions}" th:if="${t.id != taskId}"
+                                th:value="${t.id}" th:text="${t.title}">Research &amp; content audit</option>
+                    </select>
+                    <span id="predecessorId-error" class="field-error" th:if="${#fields.hasErrors('predecessorId')}"
+                          th:errors="*{predecessorId}">Error</span>
+                </div>
+
+                <div class="field" th:classappend="${#fields.hasErrors('lagDays')} ? 'has-error'">
+                    <label for="lagDays" th:text="#{dependency.field.lagDays}">Lag (working days)</label>
+                    <input type="number" id="lagDays" th:field="*{lagDays}" min="0" max="100" step="1"
+                           inputmode="numeric"
+                           th:attr="aria-invalid=${#fields.hasErrors('lagDays')}, aria-describedby=${#fields.hasErrors('lagDays')} ? 'lagDays-error'">
+                    <span id="lagDays-error" class="field-error" th:if="${#fields.hasErrors('lagDays')}"
+                          th:errors="*{lagDays}">Error</span>
+                </div>
+
+                <button class="btn btn-secondary" type="submit" th:text="#{dependency.add}">Add</button>
+            </div>
+        </form>
+    </section>
     <form class="danger-zone" method="post" th:if="${taskId != null}"
           th:action="@{/projects/{p}/tasks/{t}/delete(p=${projectId}, t=${taskId})}"
           th:data-confirm="#{task.delete.confirm(${form.title})}">

@@ -21,4 +21,14 @@ final class TaskDependencyQueries {
         JOIN d.successor s
         WHERE d.projectId = :projectId AND d.id = :id
         """;
+
+    static final String FIND_PREDECESSOR_ROWS = """
+        SELECT NEW hr.algebra.project_manager.dependency.repository.DependencyRow(
+                d.id, p.id, p.title, s.id, s.title, d.lagDays)
+        FROM TaskDependency d
+        JOIN d.predecessor p
+        JOIN d.successor s
+        WHERE d.projectId = :projectId AND s.id = :taskId
+        ORDER BY p.title
+        """;
 }

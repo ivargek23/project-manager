@@ -89,6 +89,11 @@ public class DependencyService {
                 .orElseThrow(() -> new NotFoundException("Dependency", dependencyId));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#projectId, authentication) or @projectAccess.isMember(#projectId, authentication)")
+    public List<DependencyRow> findPredecessors(Long projectId, Long taskId) {
+        return dependencyRepository.findPredecessorRows(projectId, taskId);
+    }
+
     private Project lockProject(Long projectId) {
         return projectRepository.findByIdForUpdate(projectId)
                 .orElseThrow(() -> new NotFoundException("Project", projectId));

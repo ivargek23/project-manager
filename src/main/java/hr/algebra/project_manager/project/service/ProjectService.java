@@ -46,6 +46,11 @@ public class ProjectService {
                 .orElseThrow(() -> new NotFoundException("Project", id));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @projectAccess.isLead(#id, authentication)")
+    public Project getForEdit(Long id) {
+        return get(id);
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_LEAD')")
     @Transactional
     public Long create(ProjectCommand command) {

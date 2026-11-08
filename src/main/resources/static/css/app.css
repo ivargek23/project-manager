@@ -478,3 +478,19 @@ main {
 .subtask-add .field { margin-bottom: 0; }
 .subtask-add-row { display: flex; gap: 8px; }
 .subtask-add-row input { flex: 1; min-width: 0; }
+
+/* dependencies */
+.dependency-card { margin-top: 16px; }
+.dependency-card h2 { margin-bottom: 12px; }
+.dependency-empty { margin: 0 0 16px; color: var(--text-secondary); }
+.dependency-list { list-style: none; margin: 0 0 16px; padding: 0; }
+.dependency-item { display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    border-bottom: 1px solid var(--border-default); }
+.dependency-item form { margin: 0; }
+.dependency-title { flex: 1; }
+.dependency-lag { color: var(--text-secondary); font-size: 0.875rem; white-space: nowrap; }
+.dependency-add .field { margin-bottom: 0; }
+.dependency-add-row { display: grid; grid-template-columns: 1fr 140px auto; gap: 8px; align-items: end; }
+@media (max-width: 640px) {
+    .dependency-add-row { grid-template-columns: 1fr; }
+}
